@@ -1,5 +1,7 @@
 package com.umg.simulador_mundial.controller;
 
+import org.springframework.web.bind.annotation.PostMapping;
+import com.umg.simulador_mundial.model.Equipo;
 import com.umg.simulador_mundial.repository.EquipoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -19,4 +21,19 @@ public class EquipoController {
         model.addAttribute("equipos", equipoRepository.findAll());
         return "lista-equipos"; // Este será el nombre de nuestro archivo HTML
     }
+
+    //ruta para ver el formulario
+    @GetMapping("/equipos/nuevo")
+    public String mostrarFormulario(Model model){
+        model.addAttribute("equipo", new Equipo());
+        return "formulario-equipo"; // Este será el nombre de nuestro archivo HTML para el formulario
+    }
+
+    //ruta para guardar los datos
+    @PostMapping("/equipos/guardar")
+    public String guardarEquipo(Equipo equipo) {
+        equipoRepository.save(equipo);
+        return "redirect:/equipos"; // Nos regresa a la lista automáticamente
+    }
+
 }
