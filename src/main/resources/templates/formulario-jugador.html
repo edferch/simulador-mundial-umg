@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Nuevo Jugador</title>
+</head>
+<body>
+    <h2>Registrar Nuevo Jugador</h2>
+    
+    <!-- El formulario se enviará a la ruta /jugadores/guardar y enlazará con el objeto 'jugador' -->
+    <form th:action="@{/jugadores/guardar}" th:object="${jugador}" method="post">
+        
+        <div>
+            <label>Nombre:</label>
+            <input type="text" th:field="*{nombre}" required />
+        </div>
+        <br>
+        <div>
+            <label>Posición:</label>
+            <input type="text" th:field="*{posicion}" placeholder="Ej: Portero, Delantero" />
+        </div>
+        <br>
+        <div>
+            <label>Número de Camiseta:</label>
+            <input type="number" th:field="*{numeroCamiseta}" />
+        </div>
+        <br>
+        <div>
+            <label>Equipo:</label>
+            <select th:field="*{equipo}" required>
+                <option value="">Selecciona un equipo...</option>
+                <!-- Iteramos sobre la lista de equipos enviada desde el controlador -->
+                <option th:each="equipoItem : ${equipos}" th:value="${equipoItem.id}" th:text="${equipoItem.nombre}"></option>
+            </select>
+        </div>
+        <br>
+        <button type="submit">Guardar Jugador</button>
+    </form>
+    
+    <br>
+    <a th:href="@{/jugadores}">Volver a la lista de jugadores</a>
+</body>
+</html>

@@ -15,7 +15,7 @@ public class Jugador {
 
     private String posicion; // Ejemplo: Portero, Delantero
 
-    private int numeroCamiseta;
+    private Integer numeroCamiseta;
 
     // Esta es la clave: Relacionamos al jugador con un equipo
     @ManyToOne
@@ -25,7 +25,7 @@ public class Jugador {
     // Constructores
     public Jugador() {}
 
-    public Jugador(String nombre, String posicion, int numeroCamiseta, Equipo equipo) {
+    public Jugador(String nombre, String posicion, Integer numeroCamiseta, Equipo equipo) {
         this.nombre = nombre;
         this.posicion = posicion;
         this.numeroCamiseta = numeroCamiseta;
@@ -42,8 +42,8 @@ public class Jugador {
     public String getPosicion() { return posicion; }
     public void setPosicion(String posicion) { this.posicion = posicion; }
 
-    public int getNumeroCamiseta() { return numeroCamiseta; }
-    public void setNumeroCamiseta(int numeroCamiseta) { this.numeroCamiseta = numeroCamiseta; }
+    public Integer getNumeroCamiseta() { return numeroCamiseta; }
+    public void setNumeroCamiseta(Integer numeroCamiseta) { this.numeroCamiseta = numeroCamiseta; }
 
     public Equipo getEquipo() { return equipo; }
     public void setEquipo(Equipo equipo) { this.equipo = equipo; }
