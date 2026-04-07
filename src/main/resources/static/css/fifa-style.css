@@ -1,0 +1,88 @@
+/* Variables de colores FIFA */
+:root {
+    --fifa-black: #0a0a0a;
+    --fifa-dark-gray: #161616;
+    --fifa-gold: #D4AF37;
+    --fifa-white: #ffffff;
+    --fifa-accent: #8A1538;
+    --fifa-blue: #007bff;
+}
+
+body {
+    background-color: var(--fifa-black);
+    color: var(--fifa-white);
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* Contenedor Principal (Dashboard) */
+.main-card {
+    background: var(--fifa-dark-gray);
+    padding: 40px;
+    border-radius: 15px;
+    border: 2px solid var(--fifa-gold);
+    text-align: center;
+    box-shadow: 0 0 30px rgba(212, 175, 55, 0.15);
+    margin-top: 50px;
+    width: 80%;
+    max-width: 600px;
+}
+
+h1 {
+    color: var(--fifa-gold);
+    text-transform: uppercase;
+    font-style: italic;
+    font-size: 2.5rem;
+    margin-bottom: 5px;
+}
+
+/* Botones estilo FIFA */
+.btn-fifa {
+    display: block;
+    background: linear-gradient(135deg, #2a2a2a 0%, #111 100%);
+    color: white;
+    padding: 15px 25px;
+    margin: 15px 0;
+    text-decoration: none;
+    border-radius: 5px;
+    border: 1px solid #444;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+.btn-fifa:hover {
+    background: var(--fifa-gold);
+    color: black;
+    transform: scale(1.03);
+    box-shadow: 0 0 15px var(--fifa-gold);
+}
+
+/* Estilos para Tablas */
+table {
+    width: 90%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: var(--fifa-dark-gray);
+}
+
+th {
+    background-color: var(--fifa-accent);
+    color: white;
+    padding: 12px;
+    text-transform: uppercase;
+}
+
+td {
+    border-bottom: 1px solid #333;
+    padding: 10px;
+    text-align: center;
+}
+
+tr:hover {
+    background-color: #252525;
+}

@@ -2,14 +2,10 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Simulador Mundial UMG</title>
-    <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f4f4; text-align: center; }
-        table { margin: 0 auto; border-collapse: collapse; width: 80%; background: white; }
-        th, td { border: 1px solid #ddd; padding: 12px; }
-        th { background-color: #007bff; color: white; }
-    </style>
+    <link th:href="@{/css/fifa-style.css}" rel="stylesheet">
 </head>
 <body>
+    <a href="/">🏠 Volver al Inicio</a>
     <h1>🏆 Lista de Selecciones Clasificadas</h1>
     <table>
         <thead>
@@ -29,5 +25,7 @@
             </tr>
         </tbody>
     </table>
+    <br>
+    <a href="/equipos/nuevo">➕ Registrar nueva selección</a>
 </body>
 </html>
