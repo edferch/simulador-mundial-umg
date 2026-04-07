@@ -40,4 +40,10 @@ public class Encuentro {
 
     public Integer getGolesVisitante() { return golesVisitante; }
     public void setGolesVisitante(Integer golesVisitante) { this.golesVisitante = golesVisitante; }
+
+    public LocalDateTime getFechaHora() { return fechaHora; }
+    public void setFechaHora(LocalDateTime fechaHora) { this.fechaHora = fechaHora; }
+
+    public String getEstado() { return estado; }
+    public void setEstado(String estado) { this.estado = estado; }
 }

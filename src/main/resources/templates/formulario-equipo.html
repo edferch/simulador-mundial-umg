@@ -11,7 +11,7 @@
 </head>
 <body>
     <form th:action="@{/equipos/guardar}" th:object="${equipo}" method="post">
-        <h2>📝 Registro de Selección</h2>
+        <h2>Registro de Selección</h2>
         <input type="text" th:field="*{nombre}" placeholder="Nombre del País (ej. Guatemala)" required>
         <input type="text" th:field="*{abreviatura}" placeholder="Abreviatura (ej. GUA)" maxlength="3">
         <input type="text" th:field="*{entrenador}" placeholder="Nombre del Entrenador">

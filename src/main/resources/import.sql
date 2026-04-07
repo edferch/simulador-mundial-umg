@@ -10,8 +10,6 @@ INSERT INTO jugadores (nombre, posicion, numero_camiseta, equipo_id) VALUES ('Li
 
 -- Partidos de prueba (Fase de Grupos)
 -- Asumiendo que ID 1 es Guate, ID 2 Argentina, ID 3 Francia, ID 4 Brasil
-INSERT INTO encuentros (local_id, visitante_id, goles_local, goles_visitante, estado) 
-VALUES (1, 2, 0, 0, 'PENDIENTE');
+INSERT INTO encuentros (local_id, visitante_id, goles_local, goles_visitante, estado) VALUES (1, 2, 0, 0, 'PENDIENTE');
 
-INSERT INTO encuentros (local_id, visitante_id, goles_local, goles_visitante, estado) 
-VALUES (3, 4, 0, 0, 'PENDIENTE');
+INSERT INTO encuentros (local_id, visitante_id, goles_local, goles_visitante, estado) VALUES (3, 4, 0, 0, 'PENDIENTE');
