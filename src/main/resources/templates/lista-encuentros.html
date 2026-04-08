@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Calendario Oficial - FIFA UMG</title>
+    <link th:href="@{/css/fifa-style.css}" rel="stylesheet">
+</head>
+<body>
+
+    <div class="main-card" style="max-width: 900px;">
+        <div style="margin-top: 20px; margin-bottom: 20px;">
+            <a href="/" class="btn-fifa" style="display: inline-block; width: 200px; text-align: center;">Pagina Principal</a>
+        </div>
+
+        <h1>CALENDARIO DE ENCUENTROS</h1>
+        <p>Fase de Grupos | Simulador Mundialista UMG</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Selección Local</th>
+                    <th>Resultado</th>
+                    <th>Selección Visitante</th>
+                    <th>Estado del Partido</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="partido : ${encuentros}">
+                    <td th:text="${partido.equipoLocal.nombre}" style="color: var(--fifa-gold); font-weight: bold;"></td>
+                    
+                    <td style="font-size: 1.5rem; font-weight: bold; letter-spacing: 5px;">
+                        <span th:text="${partido.golesLocal}">0</span>
+                        -
+                        <span th:text="${partido.golesVisitante}">0</span>
+                    </td>
+
+                    <td th:text="${partido.equipoVisitante.nombre}" style="color: var(--fifa-gold); font-weight: bold;"></td>
+                    
+                    <td>
+                        <span th:text="${partido.estado}" 
+                              style="background: #333; padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; border: 1px solid var(--fifa-gold);">
+                        </span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+</body>
+</html>

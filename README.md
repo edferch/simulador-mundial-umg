@@ -22,8 +22,18 @@ Para correr este proyecto en tu máquina local, sigue estos pasos al pie de la l
 2. Crea una base de datos vacía llamada exactamente **`mundial_umg`** (todo en minúsculas).
 3. No es necesario crear tablas a mano, el código en Java (Hibernate/JPA) lo hará automáticamente al correr el proyecto.
 
-### 2. Clonar y Configurar el Proyecto
+### 2. Instalar extensiones
+1. Instalar en VSCode las siguientes extensiones:
+   Java de microsoft
+   LiveServer
+
+### 3. Clonar y Configurar el Proyecto
 1. Clona este repositorio en tu computadora usando la terminal:
    ```bash
+<<<<<<< HEAD
    git clone [https://github.com/edferch/simulador-mundial-umg]
   //Saul
+=======
+   git clone https://github.com/edferch/simulador-mundial-umg
+  
+>>>>>>> Ferch

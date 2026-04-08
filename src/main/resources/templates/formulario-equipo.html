@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Registrar Equipo</title>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; padding: 50px; }
+        form { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        input { display: block; margin: 10px 0; padding: 8px; width: 250px; }
+        button { background: #28a745; color: white; border: none; padding: 10px; cursor: pointer; width: 100%; }
+    </style>
+</head>
+<body>
+    <form th:action="@{/equipos/guardar}" th:object="${equipo}" method="post">
+        <h2>Registro de Selección</h2>
+        <input type="text" th:field="*{nombre}" placeholder="Nombre del País (ej. Guatemala)" required>
+        <input type="text" th:field="*{abreviatura}" placeholder="Abreviatura (ej. GUA)" maxlength="3">
+        <input type="text" th:field="*{entrenador}" placeholder="Nombre del Entrenador">
+        <button type="submit">Guardar Selección</button>
+    </form>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Simulador Mundial UMG</title>
+    <link th:href="@{/css/fifa-style.css}" rel="stylesheet">
+</head>
+<body>
+    <div style="margin-top: 20px; margin-bottom: 20px;">
+        <a href="/" class="btn-fifa" style="display: inline-block; width: 200px; text-align: center;">Pagina Principal</a>
+    </div>
+    <h1>Lista de Selecciones Clasificadas</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Abreviatura</th>
+                <th>Entrenador</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="equipo : ${equipos}">
+                <td th:text="${equipo.id}"></td>
+                <td th:text="${equipo.nombre}"></td>
+                <td th:text="${equipo.abreviatura}"></td>
+                <td th:text="${equipo.entrenador}"></td>
+            </tr>
+        </tbody>
+    </table>
+    <br>
+    <a href="/equipos/nuevo">Registrar nueva selección</a>
+</body>
+</html>
