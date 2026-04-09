@@ -1,32 +1,100 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Plantilla de Jugadores</title>
+    <meta charset="UTF-8">
+    <title>Jugadores - FIFA UMG</title>
+    <!-- Vinculamos tu archivo CSS externo -->
     <link th:href="@{/css/fifa-style.css}" rel="stylesheet">
 </head>
 <body>
-    <div style="margin-top: 20px; margin-bottom: 20px;">
-        <a href="/" class="btn-fifa" style="display: inline-block; width: 200px; text-align: center;">Pagina Principal</a>
+
+    <div class="main-card">
+        <h1>JUGADORES REGISTRADOS</h1>
+        <p>Gestión de plantilla - Mundial 2026</p>
+
+        <!-- Mensaje de error (Ej. cuando no se puede borrar un jugador) -->
+        <div th:if="${error}" class="alert-error">
+            <span th:text="${error}"></span>
+        </div>
+
+        <!-- Botón para agregar nuevo (estilo FIFA) -->
+        <div class="text-right mb-20">
+            <a href="/jugadores/nuevo" class="btn-fifa">
+                Registrar Nuevo Jugador
+            </a>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Posición</th>
+                    <th>Número</th>
+                    <th>Equipo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Iteramos los jugadores y asignamos clase y data-id para el clic derecho -->
+                <tr th:each="jugadorItem : ${jugadores}" class="jugador-row" th:data-id="${jugadorItem.id}">
+                    <td th:text="${jugadorItem.id}">1</td>
+                    <td th:text="${jugadorItem.nombre}" class="highlight-text"></td>
+                    <td th:text="${jugadorItem.posicion}"></td>
+                    <td th:text="${jugadorItem.numeroCamiseta}"></td>
+                    <!-- Asumimos que la entidad Jugador tiene una relación con Equipo y accedemos a su nombre -->
+                    <td th:text="${jugadorItem.equipo.nombre}"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Botón de regreso -->
+        <div class="mt-20">
+            <a href="/" class="btn-fifa">Volver al Dashboard</a>
+        </div>
     </div>
-    <h1>Jugadores Inscritos</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Dorsal</th>
-                <th>Posición</th>
-                <th>Selección</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="j : ${jugadores}">
-                <td th:text="${j.nombre}"></td>
-                <td th:text="${j.numeroCamiseta}"></td>
-                <td th:text="${j.posicion}"></td>
-                <td th:text="${j.equipo.nombre}"></td> </tr>
-        </tbody>
-    </table>
-    <br>
-    <a href="/jugadores/nuevo">Inscribir nuevo jugador</a>
+
+    <!-- Menú contextual oculto por defecto -->
+    <div id="contextMenu" class="context-menu">
+        <a id="editOption" href="#">Editar</a>
+        <a id="deleteOption" href="#">Borrar</a>
+    </div>
+
+    <!-- Script para el menú contextual -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const contextMenu = document.getElementById("contextMenu");
+            const editOption = document.getElementById("editOption");
+            const deleteOption = document.getElementById("deleteOption");
+
+            // Ocultar el menú al hacer clic izquierdo en cualquier parte de la página
+            document.addEventListener("click", function() {
+                contextMenu.style.display = "none";
+            });
+
+            // Mostrar el menú al hacer clic derecho en una de las filas (jugador-row)
+            const rows = document.querySelectorAll(".jugador-row");
+            rows.forEach(row => {
+                row.addEventListener("contextmenu", function(e) {
+                    e.preventDefault();
+                    const jugadorId = this.getAttribute("data-id");
+                    
+                    // Asegurarnos de que las rutas apunten al controlador de jugadores
+                    editOption.href = "/jugadores/editar/" + jugadorId;
+                    deleteOption.href = "/jugadores/eliminar/" + jugadorId;
+                    
+                    contextMenu.style.display = "block";
+                    contextMenu.style.left = e.pageX + "px";
+                    contextMenu.style.top = e.pageY + "px";
+                });
+            });
+
+            // Confirmación antes de borrar
+            deleteOption.addEventListener("click", function(e) {
+                if(!confirm('¿Estás seguro de que quieres eliminar este jugador?')) {
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
 </body>
 </html>

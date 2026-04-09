@@ -1,15 +1,56 @@
--- Carga Masiva de Equipos
-INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Guatemala', 'GUA', 'Luis Fernando Tena');
+-- Anfitriones
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Estados Unidos', 'USA', 'Gregg Berhalter');
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('México', 'MEX', 'Jaime Lozano');
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Canadá', 'CAN', 'Mauro Biello');
+-- Conmebol
 INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Argentina', 'ARG', 'Lionel Scaloni');
-INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Francia', 'FRA', 'Didier Deschamps');
 INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Brasil', 'BRA', 'Dorival Júnior');
-
--- Carga Masiva de Jugadores (Ejemplos vinculados por ID de equipo)
-INSERT INTO jugadores (nombre, posicion, numero_camiseta, equipo_id) VALUES ('Iker Mérida', 'Portero', 1, 1);
-INSERT INTO jugadores (nombre, posicion, numero_camiseta, equipo_id) VALUES ('Lionel Messi', 'Delantero', 10, 2);
-
--- Partidos de prueba (Fase de Grupos)
--- Asumiendo que ID 1 es Guate, ID 2 Argentina, ID 3 Francia, ID 4 Brasil
-INSERT INTO encuentros (local_id, visitante_id, goles_local, goles_visitante, estado) VALUES (1, 2, 0, 0, 'PENDIENTE');
-
-INSERT INTO encuentros (local_id, visitante_id, goles_local, goles_visitante, estado) VALUES (3, 4, 0, 0, 'PENDIENTE');
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Uruguay', 'URU', 'Marcelo Bielsa');
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Colombia', 'COL', 'Néstor Lorenzo');
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Ecuador', 'ECU', 'Félix Sánchez');
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Venezuela', 'VEN', 'Fernando Batista');
+-- Concacaf (Ejemplos)
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Guatemala', 'GUA', 'Luis Fernando Tena');
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Costa Rica', 'CRC', 'Gustavo Alfaro');
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Panamá', 'PAN', 'Thomas Christiansen');
+-- UEFA (Ejemplos)
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Francia', 'FRA', 'Didier Deschamps');
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Inglaterra', 'ENG', 'Gareth Southgate');
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('España', 'ESP', 'Luis de la Fuente');
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Alemania', 'GER', 'Julian Nagelsmann');
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Portugal', 'POR', 'Roberto Martínez');
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Italia', 'ITA', 'Luciano Spalletti');
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Países Bajos', 'NED', 'Ronald Koeman');
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Croacia', 'CRO', 'Zlatko Dalić');
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Bélgica', 'BEL', 'Domenico Tedesco');
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Suiza', 'SUI', 'Murat Yakin');
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Dinamarca', 'DEN', 'Kasper Hjulmand');
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Polonia', 'POL', 'Michał Probierz');
+-- África (CAF)
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Marruecos', 'MAR', 'Walid Regragui');
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Senegal', 'SEN', 'Aliou Cissé');
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Egipto', 'EGY', 'Rui Vitória');
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Nigeria', 'NGA', 'José Peseiro');
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Argelia', 'ALG', 'Djamel Belmadi');
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Camerún', 'CMR', 'Rigobert Song');
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Ghana', 'GHA', 'Chris Hughton');
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Costa de Marfil', 'CIV', 'Jean-Louis Gasset');
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Túnez', 'TUN', 'Jalel Kadri');
+-- Asia (AFC)
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Japón', 'JPN', 'Hajime Moriyasu');
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Corea del Sur', 'KOR', 'Jürgen Klinsmann');
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Irán', 'IRN', 'Amir Ghalenoei');
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Arabia Saudita', 'KSA', 'Roberto Mancini');
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Australia', 'AUS', 'Graham Arnold');
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Qatar', 'QAT', 'Tintín Márquez');
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Irak', 'IRQ', 'Jesús Casas');
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Emiratos Árabes', 'UAE', 'Paulo Bento');
+-- Oceanía (OFC)
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Nueva Zelanda', 'NZL', 'Darren Bazeley');
+-- Completando los 48 con otros posibles clasificados
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Gales', 'WAL', 'Rob Page');
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Suecia', 'SWE', 'Jon Dahl Tomasson');
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Serbia', 'SRB', 'Dragan Stojković');
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Mali', 'MLI', 'Éric Chelle');
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Perú', 'PER', 'Jorge Fossati');
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Chile', 'CHI', 'Ricardo Gareca');

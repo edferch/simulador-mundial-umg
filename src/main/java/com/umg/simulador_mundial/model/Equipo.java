@@ -21,6 +21,7 @@ public class Equipo {
 
     private String entrenador;
 
+
     // CONSTRUCTORES (Concepto clave de POO para tu rúbrica)
     public Equipo() {
     }
@@ -30,6 +31,9 @@ public class Equipo {
         this.abreviatura = abreviatura;
         this.entrenador = entrenador;
     }
+
+    private String grupo; 
+
 
     // GETTERS Y SETTERS (Encapsulamiento, otro punto de tu rúbrica)
     public Long getId() { return id; }
@@ -43,4 +47,7 @@ public class Equipo {
 
     public String getEntrenador() { return entrenador; }
     public void setEntrenador(String entrenador) { this.entrenador = entrenador; }
+
+    public String getGrupo() { return grupo; }
+    public void setGrupo(String grupo) { this.grupo = grupo; }
 }

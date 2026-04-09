@@ -1,88 +1,180 @@
-/* Variables de colores FIFA */
+/* Variables de colores FIFA (Nueva Paleta) */
 :root {
-    --fifa-black: #0a0a0a;
-    --fifa-dark-gray: #161616;
-    --fifa-gold: #D4AF37;
-    --fifa-white: #ffffff;
-    --fifa-accent: #8A1538;
-    --fifa-blue: #007bff;
+    --fifa-neon: #D1F50A;
+    --fifa-green: #005B3A;
+    --fifa-blue: #2D23D3;
+    --fifa-red: #EA0036;
+    --fifa-light-bg: #E8F4EC;
+    --fifa-white: #FFFFFF;
+    --fifa-black: #111111;
 }
 
 body {
-    background-color: var(--fifa-black);
-    color: var(--fifa-white);
+    background-color: var(--fifa-light-bg);
+    color: var(--fifa-black);
     font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     margin: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
 }
 
 /* Contenedor Principal (Dashboard) */
 .main-card {
-    background: var(--fifa-dark-gray);
+    background: var(--fifa-white);
     padding: 40px;
-    border-radius: 15px;
-    border: 2px solid var(--fifa-gold);
+    border-radius: 10px;
+    border: 2px solid var(--fifa-green);
     text-align: center;
-    box-shadow: 0 0 30px rgba(212, 175, 55, 0.15);
-    margin-top: 50px;
-    width: 80%;
-    max-width: 600px;
+    box-shadow: 0 10px 30px rgba(0, 91, 58, 0.15);
+    width: 100%;
+    box-sizing: border-box;
 }
 
 h1 {
-    color: var(--fifa-gold);
+    color: var(--fifa-green);
     text-transform: uppercase;
-    font-style: italic;
+    font-weight: 900;
     font-size: 2.5rem;
     margin-bottom: 5px;
 }
 
+.main-card p {
+    color: var(--fifa-black);
+    font-size: 1.1rem;
+    opacity: 0.8;
+}
+
 /* Botones estilo FIFA */
 .btn-fifa {
-    display: block;
-    background: linear-gradient(135deg, #2a2a2a 0%, #111 100%);
-    color: white;
-    padding: 15px 25px;
-    margin: 15px 0;
+    display: inline-block;
+    background: var(--fifa-blue);
+    color: var(--fifa-white);
+    padding: 12px 25px;
+    margin: 10px 5px;
     text-decoration: none;
     border-radius: 5px;
-    border: 1px solid #444;
+    border: 2px solid transparent;
     font-weight: bold;
     text-transform: uppercase;
     transition: all 0.3s ease;
+    cursor: pointer;
 }
 
 .btn-fifa:hover {
-    background: var(--fifa-gold);
-    color: black;
-    transform: scale(1.03);
-    box-shadow: 0 0 15px var(--fifa-gold);
+    background: var(--fifa-neon);
+    color: var(--fifa-black);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(209, 245, 10, 0.4);
+}
+
+/* Inputs y Formularios (Para estandarizar las vistas faltantes) */
+input, select {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0 20px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+input:focus, select:focus {
+    border-color: var(--fifa-blue);
+    outline: none;
+    box-shadow: 0 0 8px rgba(45, 35, 211, 0.3);
+}
+
+label {
+    font-weight: bold;
+    color: var(--fifa-green);
+    display: block;
+    text-align: left;
 }
 
 /* Estilos para Tablas */
 table {
-    width: 90%;
+    width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
-    background-color: var(--fifa-dark-gray);
+    background-color: var(--fifa-white);
+    color: var(--fifa-black);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(0,0,0,0.05);
 }
 
 th {
-    background-color: var(--fifa-accent);
-    color: white;
-    padding: 12px;
+    background-color: var(--fifa-green);
+    color: var(--fifa-white);
+    padding: 15px;
     text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 td {
-    border-bottom: 1px solid #333;
-    padding: 10px;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 12px;
     text-align: center;
 }
 
 tr:hover {
-    background-color: #252525;
+    background-color: var(--fifa-light-bg);
+}
+
+/* Estilos para el menú contextual */
+.context-menu {
+    display: none;
+    position: absolute;
+    background-color: var(--fifa-white);
+    border: 2px solid var(--fifa-green);
+    border-radius: 5px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    z-index: 1000;
+    min-width: 120px;
+}
+
+.context-menu a {
+    display: block;
+    padding: 10px 20px;
+    color: var(--fifa-black);
+    text-decoration: none;
+    font-weight: bold;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+    text-align: left;
+}
+
+.context-menu a:last-child {
+    border-bottom: none;
+}
+
+.context-menu a:hover {
+    background-color: var(--fifa-neon);
+    color: var(--fifa-black);
+}
+
+/* Mensajes de error o alertas */
+.alert-error {
+    background-color: var(--fifa-red);
+    color: var(--fifa-white);
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    font-weight: bold;
+    text-align: center;
+    border: 2px solid var(--fifa-black);
+}
+
+/* Clases de utilidad */
+.highlight-text {
+    font-weight: bold;
+    color: var(--fifa-blue);
+}
+.text-right {
+    text-align: right;
+}
+.mt-20 {
+    margin-top: 20px;
+}
+.mb-20 {
+    margin-bottom: 20px;
 }
