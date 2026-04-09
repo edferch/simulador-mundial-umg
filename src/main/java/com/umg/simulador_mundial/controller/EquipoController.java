@@ -62,29 +62,4 @@ public class EquipoController {
         return "formulario-equipo"; // Reutilizamos el mismo formulario para editar
     }
 
-    @GetMapping("/sorteo")
-    public String realizarSorteoAleatorio(Model model){
-        List<Equipo> todosLosEquipos = equipoRepository.findAll();
-
-        //Orden aleatorio
-        Collections.shuffle(todosLosEquipos);
-
-        //Letras de los grupos
-        String[] letras = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"};
-
-        //Repartir los equipos 4 por grupo
-        for (int i = 0; i < todosLosEquipos.size(); i++){
-            String grupoAsignado = letras[i / 4]; // Cada 4 equipos, cambia la letra del grupo
-            Equipo equipos = todosLosEquipos.get(i);
-            equipos.setGrupo(grupoAsignado);
-            equipoRepository.save(equipos); // Guardamos el cambio en la base de datos
-        }
-
-        //agrupar la lista para mandarla ordenada a el html
-        Map<String, List<Equipo>> gruposFormados = todosLosEquipos.stream().collect(Collectors.groupingBy(Equipo::getGrupo));
-
-        model.addAttribute("grupos", gruposFormados);
-        return "fase-grupos";
-    }
-
 }
