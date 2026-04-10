@@ -267,16 +267,102 @@ public class SimulacionController {
     }
 
     // Ruta para ver la pantalla de eliminación directa
+    // ---------------------------------------------------------
+    // 6. VISTA DE ELIMINACIÓN DIRECTA Y REPORTES FINALES
+    // ---------------------------------------------------------
     @GetMapping("/fase-final")
     public String verFaseFinal(Model model) {
         List<Encuentro> todos = encuentroRepository.findAll();
         
-        // Filtramos los partidos por fase
-        model.addAttribute("octavos", todos.stream().filter(p -> p.getEstado().contains("OCTAVOS")).collect(Collectors.toList()));
-        model.addAttribute("cuartos", todos.stream().filter(p -> p.getEstado().contains("CUARTOS")).collect(Collectors.toList()));
-        model.addAttribute("semis", todos.stream().filter(p -> p.getEstado().contains("SEMI")).collect(Collectors.toList()));
-        model.addAttribute("final", todos.stream().filter(p -> p.getEstado().contains("GRAN_FINAL")).collect(Collectors.toList()));
+        List<Encuentro> octavos = todos.stream().filter(p -> p.getEstado().contains("OCTAVOS")).collect(Collectors.toList());
+        List<Encuentro> cuartos = todos.stream().filter(p -> p.getEstado().contains("CUARTOS")).collect(Collectors.toList());
+        List<Encuentro> semis = todos.stream().filter(p -> p.getEstado().contains("SEMI")).collect(Collectors.toList());
+        List<Encuentro> finales = todos.stream().filter(p -> p.getEstado().contains("GRAN_FINAL")).collect(Collectors.toList());
+        
+        model.addAttribute("octavos", octavos);
+        model.addAttribute("cuartos", cuartos);
+        model.addAttribute("semis", semis);
+        model.addAttribute("finales", finales);
+
+        // Si la Gran Final ya se jugó, generamos los Reportes (Cumple Rúbrica Fase 3)
+        boolean torneoTerminado = finales.stream().anyMatch(p -> p.getEstado().equals("GRAN_FINAL_FINALIZADO"));
+        model.addAttribute("torneoTerminado", torneoTerminado);
+
+        if (torneoTerminado) {
+            Encuentro partidoFinal = finales.get(0);
+            Equipo campeon = partidoFinal.getGolesLocal() > partidoFinal.getGolesVisitante() ? partidoFinal.getEquipoLocal() : partidoFinal.getEquipoVisitante();
+            model.addAttribute("campeon", campeon);
+            
+            // Usamos las consultas SQL personalizadas que hicimos antes
+            model.addAttribute("goleadores", jugadorRepository.findTop10ByOrderByGolesAnotadosDesc());
+            model.addAttribute("porteros", jugadorRepository.findTop10ByPosicionOrderByGolesRecibidosAsc("Portero"));
+        }
         
         return "fase-final-logica";
+    }
+
+    // ---------------------------------------------------------
+    // 7. MOTOR DE AVANCE DE LLAVES (Simulación de Rondas)
+    // ---------------------------------------------------------
+    @PostMapping("/simular-llaves")
+    public String simularLlaves(RedirectAttributes flash) {
+        try {
+            // Buscamos qué fase está pendiente de jugarse
+            List<Encuentro> pendientes = encuentroRepository.findAll().stream()
+                    .filter(p -> p.getEstado().contains("PENDIENTE") && !p.getEstado().equals("PENDIENTE"))
+                    .collect(Collectors.toList());
+
+            if (pendientes.isEmpty()) return "redirect:/simulacion/fase-final";
+
+            String faseActual = pendientes.get(0).getEstado();
+            List<Equipo> ganadores = new ArrayList<>();
+            Random rand = new Random();
+
+            for (Encuentro p : pendientes) {
+                int golesLocales = rand.nextInt(5);
+                int golesVisitantes = rand.nextInt(5);
+
+                // Lógica de Desempate (En eliminación directa alguien tiene que ganar)
+                if (golesLocales == golesVisitantes) {
+                    if (rand.nextBoolean()) golesLocales++; else golesVisitantes++;
+                }
+
+                p.setGolesLocal(golesLocales);
+                p.setGolesVisitante(golesVisitantes);
+                p.setEstado(faseActual.replace("PENDIENTE", "FINALIZADO"));
+                encuentroRepository.save(p);
+
+                // Le sumamos los goles a los jugadores para los reportes
+                asignarGolesAJugadores(p.getEquipoLocal(), golesLocales, golesVisitantes);
+                asignarGolesAJugadores(p.getEquipoVisitante(), golesVisitantes, golesLocales);
+
+                // Guardamos al ganador para la siguiente ronda
+                if (golesLocales > golesVisitantes) ganadores.add(p.getEquipoLocal());
+                else ganadores.add(p.getEquipoVisitante());
+            }
+
+            // Crear los cruces de la Siguiente Ronda
+            String siguienteFase = "";
+            if (faseActual.contains("OCTAVOS")) siguienteFase = "CUARTOS_PENDIENTE";
+            else if (faseActual.contains("CUARTOS")) siguienteFase = "SEMI_PENDIENTE";
+            else if (faseActual.contains("SEMI")) siguienteFase = "GRAN_FINAL_PENDIENTE";
+
+            if (!siguienteFase.isEmpty()) {
+                for (int i = 0; i < ganadores.size(); i += 2) {
+                    Encuentro nuevo = new Encuentro();
+                    nuevo.setEquipoLocal(ganadores.get(i));
+                    nuevo.setEquipoVisitante(ganadores.get(i + 1));
+                    nuevo.setEstado(siguienteFase);
+                    nuevo.setFechaHora(LocalDateTime.now());
+                    encuentroRepository.save(nuevo);
+                }
+            }
+
+            return "redirect:/simulacion/fase-final";
+
+        } catch (Exception e) {
+            flash.addFlashAttribute("error", "Error crítico al simular la llave: " + e.getMessage());
+            return "redirect:/simulacion/fase-final";
+        }
     }
 }

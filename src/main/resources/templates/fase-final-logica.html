@@ -2,37 +2,166 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Eliminación Directa</title>
+    <title>Fase Final - FIFA UMG</title>
+    <link th:href="@{/css/fifa-style.css}" rel="stylesheet">
 </head>
-<body>
-    <h1>Motor de Eliminación Directa</h1>
-    <a href="/simulacion">Volver al Panel</a>
-    <hr>
+<body style="background: var(--fifa-dark-bg);">
 
-    <h2>Octavos de Final (16 Equipos)</h2>
-    <table border="1" style="width: 50%; text-align: center; border-collapse: collapse;">
-        <tr style="background-color: #ddd;">
-            <th>Local</th>
-            <th>Goles</th>
-            <th>Goles</th>
-            <th>Visitante</th>
-            <th>Estado</th>
-        </tr>
-        <tr th:each="partido : ${octavos}">
-            <td th:text="${partido.equipoLocal.nombre}"></td>
-            <td th:text="${partido.golesLocal}" style="font-weight: bold;"></td>
-            <td th:text="${partido.golesVisitante}" style="font-weight: bold;"></td>
-            <td th:text="${partido.equipoVisitante.nombre}"></td>
-            <td th:text="${partido.estado}"></td>
-        </tr>
-    </table>
-    <br>
+    <div class="main-card" style="background: transparent; border: none; box-shadow: none; padding: 10px;">
+        
+        <div style="text-align: center; margin-bottom: 30px;">
+            <h1 class="bracket-title">FIFA WORLD CUP™ FINALS</h1>
+            <p style="color: var(--fifa-red); font-weight: bold; letter-spacing: 5px; margin-top: -20px;">CAMINO A LA GLORIA</p>
+            
+            <form th:if="${!torneoTerminado}" th:action="@{/simulacion/simular-llaves}" method="post" style="margin-top: 20px;">
+                <button type="submit" class="btn-fifa" style="background: var(--fifa-neon); color: black; font-size: 1.2rem; padding: 15px 40px;">
+                    ▶ SIMULAR SIGUIENTE RONDA
+                </button>
+            </form>
+            
+            <div th:if="${error}" class="alert-error" style="max-width: 600px; margin: 20px auto;">
+                ⚠️ <span th:text="${error}"></span>
+            </div>
+        </div>
 
-    <form th:action="@{/simulacion/simular-llaves}" method="post">
-        <button type="submit" style="padding: 10px; background-color: orange; font-weight: bold;">
-            ▶ SIMULAR PARTIDOS PENDIENTES
-        </button>
-    </form>
+        <div class="bracket-wrapper-split">
+            
+            <div class="bracket-side-group side-left">
+                
+                <div class="round-column">
+                    <div style="text-align: center; color: #555; font-size: 0.7rem; margin-bottom: 10px; letter-spacing: 2px;">OCTAVOS</div>
+                    <div th:each="p, stat : ${octavos}" th:if="${stat.index < 4}" class="match-tile" style="border-left: 4px solid var(--fifa-blue);">
+                        <div class="team-row" th:classappend="${p.golesLocal > p.golesVisitante and p.estado.contains('FINALIZADO') ? 'team-winner' : ''}">
+                            <span th:text="${p.equipoLocal.abreviatura}">ARG</span>
+                            <span class="score-box" th:text="${p.golesLocal}">0</span>
+                        </div>
+                        <div class="team-row" th:classappend="${p.golesVisitante > p.golesLocal and p.estado.contains('FINALIZADO') ? 'team-winner' : ''}">
+                            <span th:text="${p.equipoVisitante.abreviatura}">MEX</span>
+                            <span class="score-box" th:text="${p.golesVisitante}">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="round-column">
+                    <div th:each="p, stat : ${cuartos}" th:if="${stat.index < 2}" class="match-tile" style="border-left: 4px solid var(--fifa-neon);">
+                        <div class="team-row" th:classappend="${p.golesLocal > p.golesVisitante and p.estado.contains('FINALIZADO') ? 'team-winner' : ''}">
+                            <span th:text="${p.equipoLocal != null ? p.equipoLocal.abreviatura : '???' }"></span>
+                            <span class="score-box" th:text="${p.golesLocal}">0</span>
+                        </div>
+                        <div class="team-row" th:classappend="${p.golesVisitante > p.golesLocal and p.estado.contains('FINALIZADO') ? 'team-winner' : ''}">
+                            <span th:text="${p.equipoVisitante != null ? p.equipoVisitante.abreviatura : '???' }"></span>
+                            <span class="score-box" th:text="${p.golesVisitante}">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="round-column">
+                    <div th:each="p, stat : ${semis}" th:if="${stat.index == 0}" class="match-tile" style="border-left: 4px solid var(--fifa-cyan);">
+                        <div class="team-row" th:classappend="${p.golesLocal > p.golesVisitante and p.estado.contains('FINALIZADO') ? 'team-winner' : ''}">
+                            <span th:text="${p.equipoLocal != null ? p.equipoLocal.abreviatura : '???' }"></span>
+                            <span class="score-box" th:text="${p.golesLocal}">0</span>
+                        </div>
+                        <div class="team-row" th:classappend="${p.golesVisitante > p.golesLocal and p.estado.contains('FINALIZADO') ? 'team-winner' : ''}">
+                            <span th:text="${p.equipoVisitante != null ? p.equipoVisitante.abreviatura : '???' }"></span>
+                            <span class="score-box" th:text="${p.golesVisitante}">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="round-column final-column">
+                <div style="text-align: center; color: gold; font-weight: bold; font-size: 1.2rem; margin-bottom: 10px; letter-spacing: 3px;">FINAL</div>
+                <div th:each="p : ${finales}" class="match-tile final-match-tile">
+                    <div class="team-row" th:classappend="${p.golesLocal > p.golesVisitante and p.estado.contains('FINALIZADO') ? 'team-winner' : ''}">
+                        <span th:text="${p.equipoLocal != null ? p.equipoLocal.nombre : '???' }" style="font-weight: 900; font-size: 1.1rem;"></span>
+                        <span class="score-box" th:text="${p.golesLocal}" style="color: var(--fifa-cyan); font-size: 1.5rem;">0</span>
+                    </div>
+                    <div class="team-row" th:classappend="${p.golesVisitante > p.golesLocal and p.estado.contains('FINALIZADO') ? 'team-winner' : ''}">
+                        <span th:text="${p.equipoVisitante != null ? p.equipoVisitante.nombre : '???' }" style="font-weight: 900; font-size: 1.1rem;"></span>
+                        <span class="score-box" th:text="${p.golesVisitante}" style="color: var(--fifa-cyan); font-size: 1.5rem;">0</span>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 20px; font-size: 3rem;">🏆</div>
+            </div>
+
+            <div class="bracket-side-group side-right">
+                
+                <div class="round-column right-aligned-cols">
+                    <div th:each="p, stat : ${semis}" th:if="${stat.index == 1}" class="match-tile" style="border-right: 4px solid var(--fifa-cyan);">
+                        <div class="team-row" th:classappend="${p.golesLocal > p.golesVisitante and p.estado.contains('FINALIZADO') ? 'team-winner' : ''}">
+                            <span th:text="${p.equipoLocal != null ? p.equipoLocal.abreviatura : '???' }"></span>
+                            <span class="score-box" th:text="${p.golesLocal}">0</span>
+                        </div>
+                        <div class="team-row" th:classappend="${p.golesVisitante > p.golesLocal and p.estado.contains('FINALIZADO') ? 'team-winner' : ''}">
+                            <span th:text="${p.equipoVisitante != null ? p.equipoVisitante.abreviatura : '???' }"></span>
+                            <span class="score-box" th:text="${p.golesVisitante}">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="round-column right-aligned-cols">
+                    <div th:each="p, stat : ${cuartos}" th:if="${stat.index >= 2}" class="match-tile" style="border-right: 4px solid var(--fifa-neon);">
+                        <div class="team-row" th:classappend="${p.golesLocal > p.golesVisitante and p.estado.contains('FINALIZADO') ? 'team-winner' : ''}">
+                            <span th:text="${p.equipoLocal != null ? p.equipoLocal.abreviatura : '???' }"></span>
+                            <span class="score-box" th:text="${p.golesLocal}">0</span>
+                        </div>
+                        <div class="team-row" th:classappend="${p.golesVisitante > p.golesLocal and p.estado.contains('FINALIZADO') ? 'team-winner' : ''}">
+                            <span th:text="${p.equipoVisitante != null ? p.equipoVisitante.abreviatura : '???' }"></span>
+                            <span class="score-box" th:text="${p.golesVisitante}">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="round-column right-aligned-cols">
+                    <div style="text-align: center; color: #555; font-size: 0.7rem; margin-bottom: 10px; letter-spacing: 2px;">OCTAVOS</div>
+                    <div th:each="p, stat : ${octavos}" th:if="${stat.index >= 4}" class="match-tile" style="border-right: 4px solid var(--fifa-blue);">
+                        <div class="team-row" th:classappend="${p.golesLocal > p.golesVisitante and p.estado.contains('FINALIZADO') ? 'team-winner' : ''}">
+                            <span th:text="${p.equipoLocal.abreviatura}">BRA</span>
+                            <span class="score-box" th:text="${p.golesLocal}">0</span>
+                        </div>
+                        <div class="team-row" th:classappend="${p.golesVisitante > p.golesLocal and p.estado.contains('FINALIZADO') ? 'team-winner' : ''}">
+                            <span th:text="${p.equipoVisitante.abreviatura}">FRA</span>
+                            <span class="score-box" th:text="${p.golesVisitante}">0</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div th:if="${torneoTerminado}" style="margin-top: 50px; padding: 40px; background: rgba(209, 245, 10, 0.05); border: 2px solid var(--fifa-neon); border-radius: 12px; text-align: center;">
+            <h1 style="color: var(--fifa-neon); font-size: 3rem; margin-bottom: 0;">🎉 ¡NUEVO CAMPEÓN MUNDIAL! 🎉</h1>
+            <h1 th:text="${campeon.nombre}" style="font-size: 5rem; color: white; margin-top: 10px; text-shadow: 0 0 30px var(--fifa-neon);"></h1>
+            
+            <div style="display: flex; justify-content: space-around; margin-top: 50px; text-align: left;">
+                <div style="background: rgba(0,0,0,0.4); padding: 25px; border-radius: 10px; width: 45%; border-left: 5px solid var(--fifa-red);">
+                    <h2 style="color: var(--fifa-red); text-transform: uppercase; font-style: italic;">⚽ BOTA DE ORO</h2>
+                    <div th:each="j, stat : ${goleadores}" th:if="${stat.index < 5}" style="margin-bottom: 10px; font-size: 1.2rem; border-bottom: 1px solid #333; padding-bottom: 5px;">
+                        <span th:text="${j.nombre}" style="font-weight: bold;"></span> 
+                        <span style="color: gray; font-size: 0.9rem;" th:text="'(' + ${j.equipo.abreviatura} + ')'"></span>
+                        <span style="float: right; color: var(--fifa-neon);" th:text="${j.golesAnotados} + ' G'"></span>
+                    </div>
+                </div>
+
+                <div style="background: rgba(0,0,0,0.4); padding: 25px; border-radius: 10px; width: 45%; border-left: 5px solid var(--fifa-cyan);">
+                    <h2 style="color: var(--fifa-cyan); text-transform: uppercase; font-style: italic;">🧤 GUANTE DE ORO</h2>
+                    <div th:each="p, stat : ${porteros}" th:if="${stat.index < 5}" style="margin-bottom: 10px; font-size: 1.2rem; border-bottom: 1px solid #333; padding-bottom: 5px;">
+                        <span th:text="${p.nombre}" style="font-weight: bold;"></span>
+                        <span style="color: gray; font-size: 0.9rem;" th:text="'(' + ${p.equipo.abreviatura} + ')'"></span>
+                        <span style="float: right; color: var(--fifa-cyan);" th:text="${p.golesRecibidos} + ' GR'"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-20">
+                <a href="/simulacion" class="btn-fifa" style="background: white; color: black; padding: 15px 50px;">REPETIR TORNEO</a>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 40px;">
+            <a href="/simulacion" class="btn-fifa" style="background: #333; border: 1px solid #555;">← VOLVER AL PANEL</a>
+        </div>
+    </div>
 
 </body>
 </html>

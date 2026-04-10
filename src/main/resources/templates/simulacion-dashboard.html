@@ -2,82 +2,102 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Panel de Simulación</title>
+    <title>Panel de Simulación - FIFA UMG</title>
+    <link th:href="@{/css/fifa-style.css}" rel="stylesheet">
 </head>
-<body>
-    <h1>Centro de Simulación de Torneo</h1>
-    <a href="/">Volver al Menú Principal</a>
-    <hr>
+<body style="background: var(--fifa-dark-bg);">
 
-    <div th:if="${!sorteoRealizado}">
-        <h2>Fase 1: Preparación</h2>
-        <p>Realiza el sorteo para armar los grupos y el calendario.</p>
-        <form th:action="@{/simulacion/sortear}" method="post">
-            <button type="submit">Realizar Sorteo</button>
-        </form>
-    </div>
-
-    <div th:if="${sorteoRealizado}">
+    <div class="main-card" style="background: transparent; border: none; box-shadow: none; text-align: left; padding: 20px;">
         
-        <div th:if="${!faseGruposTerminada}">
-            <h2>Fase 2: Motor de Simulación</h2>
-            <p>Los 72 partidos están creados. Presiona el botón para jugar la fase de grupos completa.</p>
-            <form th:action="@{/simulacion/jugar-grupos}" method="post">
-                <button type="submit" style="padding: 15px; background-color: darkred; color: white; cursor: pointer;">
-                    ⚽ SIMULAR TODOS LOS PARTIDOS (Generar Resultados)
+        <div style="margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px;">
+            <div>
+                <h1 style="color: white; font-style: italic; margin: 0;">CENTRO DE SIMULACIÓN</h1>
+                <p style="color: var(--fifa-cyan); font-weight: bold; letter-spacing: 2px; margin: 5px 0 0 0;">ESTADÍSTICAS Y CLASIFICACIÓN EN VIVO</p>
+            </div>
+            <a href="/" class="btn-fifa" style="background: #333; border: 1px solid #555; margin: 0;">← VOLVER AL MENÚ</a>
+        </div>
+
+        <div th:if="${error}" class="alert-error" style="max-width: 800px; margin: 0 auto 20px auto;">
+            ⚠️ <b>ERROR DEL SISTEMA:</b> <span th:text="${error}"></span>
+        </div>
+
+        <div th:if="${!sorteoRealizado}" style="text-align: center; padding: 60px 0;">
+            <h2 style="color: var(--fifa-white);">EL MUNDIAL NO HA COMENZADO</h2>
+            <p style="color: #888;">Debes realizar el sorteo oficial para definir los 12 grupos de 4 selecciones.</p>
+            <form th:action="@{/simulacion/sortear}" method="post">
+                <button type="submit" class="btn-fifa" style="background-color: var(--fifa-red); font-size: 1.2rem; padding: 15px 40px;">
+                    🎲 REALIZAR SORTEO OFICIAL
                 </button>
             </form>
-            <br>
         </div>
 
-        <div th:if="${error}" style="background-color: #ffcccc; color: red; padding: 10px; border: 1px solid red; margin-bottom: 15px;">
-            ⚠️ <b>Error del Sistema:</b> <span th:text="${error}"></span>
-        </div>
-
-        <div th:if="${faseGruposTerminada}">
-            <h2 style="color: green;">✅ Fase de Grupos Finalizada</h2>
-            <p>Los resultados han sido procesados. Los equipos están ordenados por Puntos y Diferencia de Goles.</p>
+        <div th:if="${sorteoRealizado}">
             
-            <form th:action="@{/simulacion/generar-octavos}" method="post">
-                <button type="submit" style="padding: 15px; background-color: #005B3A; color: white; cursor: pointer; font-weight: bold;">
-                    🏆 CLASIFICAR 16 MEJORES Y ARMAR OCTAVOS DE FINAL
-                </button>
-            </form>
-            <br><br>
-        </div>
+            <div th:if="${!faseGruposTerminada}" style="background: rgba(234, 0, 54, 0.1); border: 1px solid var(--fifa-red); padding: 20px; border-radius: 8px; margin-bottom: 30px; text-align: center;">
+                <h2 style="color: var(--fifa-white); margin-top: 0;">FASE DE GRUPOS EN CURSO</h2>
+                <p style="color: #ccc;">Hay 72 encuentros pendientes en el calendario oficial.</p>
+                <form th:action="@{/simulacion/jugar-grupos}" method="post">
+                    <button type="submit" class="btn-fifa" style="background-color: var(--fifa-red); font-size: 1.1rem;">
+                        ⚽ SIMULAR TODOS LOS PARTIDOS
+                    </button>
+                </form>
+            </div>
 
-        <div style="display: flex; flex-wrap: wrap; gap: 20px;">
-            <div th:each="entrada : ${tablasPosiciones}" style="border: 1px solid black; padding: 10px; width: 45%;">
-                <h3 th:text="'GRUPO ' + ${entrada.key}"></h3>
+            <div th:if="${faseGruposTerminada}" style="background: rgba(0, 255, 204, 0.1); border: 1px solid var(--fifa-cyan); padding: 20px; border-radius: 8px; margin-bottom: 30px; text-align: center;">
+                <h2 style="color: var(--fifa-white); margin-top: 0;">✅ FASE DE GRUPOS FINALIZADA</h2>
+                <p style="color: #ccc;">Los clasificados han sido definidos según puntos y diferencia de goles.</p>
+                <form th:action="@{/simulacion/generar-octavos}" method="post">
+                    <button type="submit" class="btn-fifa" style="background-color: var(--fifa-cyan); color: black; font-size: 1.1rem;">
+                        🏆 CLASIFICAR 16 MEJORES Y ARMAR OCTAVOS
+                    </button>
+                </form>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 30px;">
                 
-                <table border="1" style="width: 100%; border-collapse: collapse; text-align: center;">
-                    <thead style="background-color: #ddd;">
-                        <tr>
-                            <th>Pos</th>
-                            <th style="text-align: left;">Equipo</th>
-                            <th>PJ</th>
-                            <th>GF</th>
-                            <th>GC</th>
-                            <th>DG</th>
-                            <th>PTS</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="stats, status : ${entrada.value}" th:style="${status.index < 2} ? 'background-color: #e6ffe6;' : ''">
-                            <td th:text="${status.index + 1}"></td>
-                            <td style="text-align: left;" th:text="${stats.equipo.nombre}"></td>
-                            <td th:text="${stats.partidosJugados}"></td>
-                            <td th:text="${stats.golesFavor}"></td>
-                            <td th:text="${stats.golesContra}"></td>
-                            <td th:text="${stats.diferenciaGoles}"></td>
-                            <td th:text="${stats.puntos}" style="font-weight: bold;"></td>
-                        </tr>
-                    </tbody>
-                </table>
-                <small style="color: gray;">* En verde: Clasificados a Octavos</small>
+                <div th:each="entrada : ${tablasPosiciones}" class="fifa-table-container">
+                    <div class="group-header-bar" th:text="'GROUP ' + ${entrada.key}">GROUP A</div>
+                    
+                    <table class="fifa-table-dark">
+                        <thead>
+                            <tr>
+                                <th>Pos</th>
+                                <th style="text-align: left;">Club</th>
+                                <th>PJ</th>
+                                <th>GF</th>
+                                <th>GC</th>
+                                <th>DG</th>
+                                <th>Pts</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="stats, status : ${entrada.value}">
+                                <td class="pos-column" th:text="${status.index + 1}">1</td>
+                                
+                                <td class="team-column-dark">
+                                    <span th:text="${stats.equipo.nombre}">Spain</span>
+                                    <span th:if="${status.index < 2}" class="qualified-indicator">★</span>
+                                </td>
+                                
+                                <td th:text="${stats.partidosJugados}">0</td>
+                                <td th:text="${stats.golesFavor}">0</td>
+                                <td th:text="${stats.golesContra}">0</td>
+                                <td th:text="${stats.diferenciaGoles}" 
+                                    th:style="${stats.diferenciaGoles > 0 ? 'color: var(--fifa-cyan)' : (stats.diferenciaGoles < 0 ? 'color: var(--fifa-red)' : '')}">
+                                    0
+                                </td>
+                                <td th:text="${stats.puntos}" style="font-weight: 900; font-size: 1.2rem; color: var(--fifa-white);">0</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
             </div>
         </div>
 
+        <div style="text-align: center; margin-top: 50px; color: #555; font-size: 0.8rem;">
+            FIFA WORLD CUP 2026™ SIMULATOR | UNIVERSIDAD MARIANO GÁLVEZ
+        </div>
     </div>
 
 </body>
