@@ -30,10 +30,19 @@
             <br>
         </div>
 
+        <div th:if="${error}" style="background-color: #ffcccc; color: red; padding: 10px; border: 1px solid red; margin-bottom: 15px;">
+            ⚠️ <b>Error del Sistema:</b> <span th:text="${error}"></span>
+        </div>
+
         <div th:if="${faseGruposTerminada}">
             <h2 style="color: green;">✅ Fase de Grupos Finalizada</h2>
             <p>Los resultados han sido procesados. Los equipos están ordenados por Puntos y Diferencia de Goles.</p>
-            <button disabled>Ir a Octavos de Final (Próximamente)</button>
+            
+            <form th:action="@{/simulacion/generar-octavos}" method="post">
+                <button type="submit" style="padding: 15px; background-color: #005B3A; color: white; cursor: pointer; font-weight: bold;">
+                    🏆 CLASIFICAR 16 MEJORES Y ARMAR OCTAVOS DE FINAL
+                </button>
+            </form>
             <br><br>
         </div>
 

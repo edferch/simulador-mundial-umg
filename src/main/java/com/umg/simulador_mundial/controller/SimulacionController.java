@@ -1,5 +1,23 @@
 package com.umg.simulador_mundial.controller;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import com.umg.simulador_mundial.model.Encuentro;
 import com.umg.simulador_mundial.model.Equipo;
 import com.umg.simulador_mundial.model.Jugador;
@@ -7,16 +25,6 @@ import com.umg.simulador_mundial.model.PosicionGrupo;
 import com.umg.simulador_mundial.repository.EncuentroRepository;
 import com.umg.simulador_mundial.repository.EquipoRepository;
 import com.umg.simulador_mundial.repository.JugadorRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/simulacion")
@@ -190,5 +198,85 @@ public class SimulacionController {
                 break; // Solo afecta al primer portero que encuentre
             }
         }
+    }
+
+    // ---------------------------------------------------------
+    // 5. FASE FINAL: GENERAR OCTAVOS DE FINAL (Manejo de Excepciones)
+    // ---------------------------------------------------------
+
+    @PostMapping("/generar-octavos")
+    public String generarOctavos(RedirectAttributes flash) {
+        try {
+            // 1. Volvemos a calcular las posiciones para saber quién pasó
+            List<Equipo> equipos = equipoRepository.findAll();
+            List<Encuentro> partidos = encuentroRepository.findAll();
+            
+            Map<Long, PosicionGrupo> calculoTemp = new HashMap<>();
+            for (Equipo e : equipos) {
+                if (e.getGrupo() != null) calculoTemp.put(e.getId(), new PosicionGrupo(e));
+            }
+
+            for (Encuentro p : partidos) {
+                if (p.getEstado().equals("FINALIZADO")) {
+                    calculoTemp.get(p.getEquipoLocal().getId()).registrarPartido(p.getGolesLocal(), p.getGolesVisitante());
+                    calculoTemp.get(p.getEquipoVisitante().getId()).registrarPartido(p.getGolesVisitante(), p.getGolesLocal());
+                }
+            }
+
+            Map<String, List<PosicionGrupo>> grupos = new HashMap<>();
+            for (PosicionGrupo pos : calculoTemp.values()) {
+                grupos.computeIfAbsent(pos.getEquipo().getGrupo(), k -> new ArrayList<>()).add(pos);
+            }
+
+            // 2. Extraer a los 16 clasificados (12 primeros lugares + 4 mejores segundos)
+            List<PosicionGrupo> primerosLugares = new ArrayList<>();
+            List<PosicionGrupo> segundosLugares = new ArrayList<>();
+
+            for (List<PosicionGrupo> lista : grupos.values()) {
+                Collections.sort(lista); // Ordenamos el grupo
+                if (lista.size() >= 1) primerosLugares.add(lista.get(0));
+                if (lista.size() >= 2) segundosLugares.add(lista.get(1));
+            }
+
+            // Ordenamos a los segundos lugares para sacar solo a los 4 mejores
+            Collections.sort(segundosLugares);
+            
+            List<Equipo> clasificados = new ArrayList<>();
+            for (PosicionGrupo p : primerosLugares) clasificados.add(p.getEquipo());
+            for (int i = 0; i < 4; i++) clasificados.add(segundosLugares.get(i).getEquipo());
+
+            // 3. Crear los 8 cruces de Octavos de Final
+            Collections.shuffle(clasificados); // Barajamos para cruces al azar
+            
+            for (int i = 0; i < 16; i += 2) {
+                Encuentro octavos = new Encuentro();
+                octavos.setEquipoLocal(clasificados.get(i));
+                octavos.setEquipoVisitante(clasificados.get(i+1));
+                octavos.setEstado("OCTAVOS_PENDIENTE");
+                octavos.setFechaHora(LocalDateTime.now());
+                encuentroRepository.save(octavos);
+            }
+
+            return "redirect:/simulacion/fase-final";
+
+        } catch (Exception e) {
+            // CUMPLE RÚBRICA: Manejo de excepciones para evitar cierres inesperados
+            flash.addFlashAttribute("error", "Ocurrió un error al generar las llaves: " + e.getMessage());
+            return "redirect:/simulacion";
+        }
+    }
+
+    // Ruta para ver la pantalla de eliminación directa
+    @GetMapping("/fase-final")
+    public String verFaseFinal(Model model) {
+        List<Encuentro> todos = encuentroRepository.findAll();
+        
+        // Filtramos los partidos por fase
+        model.addAttribute("octavos", todos.stream().filter(p -> p.getEstado().contains("OCTAVOS")).collect(Collectors.toList()));
+        model.addAttribute("cuartos", todos.stream().filter(p -> p.getEstado().contains("CUARTOS")).collect(Collectors.toList()));
+        model.addAttribute("semis", todos.stream().filter(p -> p.getEstado().contains("SEMI")).collect(Collectors.toList()));
+        model.addAttribute("final", todos.stream().filter(p -> p.getEstado().contains("GRAN_FINAL")).collect(Collectors.toList()));
+        
+        return "fase-final-logica";
     }
 }

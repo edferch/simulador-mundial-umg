@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Eliminación Directa</title>
+</head>
+<body>
+    <h1>Motor de Eliminación Directa</h1>
+    <a href="/simulacion">Volver al Panel</a>
+    <hr>
+
+    <h2>Octavos de Final (16 Equipos)</h2>
+    <table border="1" style="width: 50%; text-align: center; border-collapse: collapse;">
+        <tr style="background-color: #ddd;">
+            <th>Local</th>
+            <th>Goles</th>
+            <th>Goles</th>
+            <th>Visitante</th>
+            <th>Estado</th>
+        </tr>
+        <tr th:each="partido : ${octavos}">
+            <td th:text="${partido.equipoLocal.nombre}"></td>
+            <td th:text="${partido.golesLocal}" style="font-weight: bold;"></td>
+            <td th:text="${partido.golesVisitante}" style="font-weight: bold;"></td>
+            <td th:text="${partido.equipoVisitante.nombre}"></td>
+            <td th:text="${partido.estado}"></td>
+        </tr>
+    </table>
+    <br>
+
+    <form th:action="@{/simulacion/simular-llaves}" method="post">
+        <button type="submit" style="padding: 10px; background-color: orange; font-weight: bold;">
+            ▶ SIMULAR PARTIDOS PENDIENTES
+        </button>
+    </form>
+
+</body>
+</html>
