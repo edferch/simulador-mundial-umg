@@ -54,3 +54,22 @@ INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Serbia', 'SRB', '
 INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Mali', 'MLI', 'Éric Chelle');
 INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Perú', 'PER', 'Jorge Fossati');
 INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Chile', 'CHI', 'Ricardo Gareca');
+
+-- CARGA MASIVA DE JUGADORES (Fase 1)
+-- Jugadores de Argentina (ID: 4)
+INSERT INTO jugadores (nombre, posicion, numero_camiseta, equipo_id) VALUES ('Emiliano Martínez', 'Portero', 23, 4);
+INSERT INTO jugadores (nombre, posicion, numero_camiseta, equipo_id) VALUES ('Lionel Messi', 'Delantero', 10, 4);
+INSERT INTO jugadores (nombre, posicion, numero_camiseta, equipo_id) VALUES ('Julián Álvarez', 'Delantero', 9, 4);
+
+-- Jugadores de Guatemala (ID: 10)
+INSERT INTO jugadores (nombre, posicion, numero_camiseta, equipo_id) VALUES ('Nicholas Hagen', 'Portero', 1, 10);
+INSERT INTO jugadores (nombre, posicion, numero_camiseta, equipo_id) VALUES ('Rubio Rubín', 'Delantero', 9, 10);
+INSERT INTO jugadores (nombre, posicion, numero_camiseta, equipo_id) VALUES ('Aaron Herrera', 'Defensa', 2, 10);
+
+-- Jugadores de Francia (ID: 13)
+INSERT INTO jugadores (nombre, posicion, numero_camiseta, equipo_id) VALUES ('Kylian Mbappé', 'Delantero', 10, 13);
+INSERT INTO jugadores (nombre, posicion, numero_camiseta, equipo_id) VALUES ('Antoine Griezmann', 'Mediocampista', 7, 13);
+
+-- Jugadores de Brasil (ID: 5)
+INSERT INTO jugadores (nombre, posicion, numero_camiseta, equipo_id) VALUES ('Vinícius Júnior', 'Delantero', 7, 5);
+INSERT INTO jugadores (nombre, posicion, numero_camiseta, equipo_id) VALUES ('Alisson Becker', 'Portero', 1, 5);

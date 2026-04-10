@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro de Estadio</title>
+    <link th:href="@{/css/fifa-style.css}" rel="stylesheet">
+</head>
+<body>
+    <div class="main-card" style="max-width: 600px; margin: 40px auto;">
+        
+        <h1 th:text="${estadio.id != null} ? 'Editar Estadio' : 'Registrar Nuevo Estadio'"></h1>
+        
+        <form th:action="@{/estadios/guardar}" th:object="${estadio}" method="post">
+            
+            <input type="hidden" th:field="*{id}" />
+
+            <div>
+                <label>Nombre del Estadio:</label>
+                <input type="text" th:field="*{nombre}" placeholder="Ej. Estadio Azteca" required />
+            </div>
+
+            <div>
+                <label>Ciudad Sede:</label>
+                <input type="text" th:field="*{ciudad}" placeholder="Ej. Ciudad de México" required />
+            </div>
+
+            <div>
+                <label>Capacidad (Aforo total):</label>
+                <input type="number" th:field="*{capacidad}" placeholder="Ej. 83264" required />
+            </div>
+
+            <button type="submit" class="btn-fifa" style="width: 100%; margin-top: 20px; font-size: 1.2rem;">
+                💾 Guardar Sede
+            </button>
+        </form>
+        
+        <div class="mt-20">
+            <a th:href="@{/estadios}" class="btn-fifa" style="background-color: #555;">Cancelar / Volver</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -22,6 +22,12 @@
             <a href="/jugadores/nuevo" class="btn-fifa">
                 Registrar Nuevo Jugador
             </a>
+            <form th:action="@{/jugadores}" method="get" style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <input type="text" name="buscar" th:value="${terminoBusqueda}" placeholder="🔍 Buscar jugador por nombre (Ej. Messi, Hagen)..." style="flex: 1; margin: 0;" />
+                <button type="submit" class="btn-fifa" style="margin: 0;">Buscar</button>
+            
+                <a th:if="${terminoBusqueda != null}" href="/jugadores" class="btn-fifa" style="background-color: var(--fifa-red); margin: 0;">✖ Limpiar</a>
+            </form>
         </div>
 
         <table>

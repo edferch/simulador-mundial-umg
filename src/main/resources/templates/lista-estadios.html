@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Sedes - FIFA UMG</title>
+    <link th:href="@{/css/fifa-style.css}" rel="stylesheet">
+</head>
+<body>
+
+    <div class="main-card">
+        <h1>🏟️ ESTADIOS MUNDIALISTAS</h1>
+        <p>Gestión de Sedes Oficiales - Mundial 2026</p>
+
+        <div th:if="${error}" class="alert-error">
+            <span th:text="${error}"></span>
+        </div>
+
+        <div class="text-right mb-20">
+            <a href="/estadios/nuevo" class="btn-fifa" style="background-color: var(--fifa-green);">
+                ➕ Registrar Nueva Sede
+            </a>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre del Estadio</th>
+                    <th>Ciudad Sede</th>
+                    <th>Aforo (Capacidad)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="estadioItem : ${estadios}" class="estadio-row" th:data-id="${estadioItem.id}">
+                    <td th:text="${estadioItem.id}">1</td>
+                    <td th:text="${estadioItem.nombre}" class="highlight-text"></td>
+                    <td th:text="${estadioItem.ciudad}"></td>
+                    <td th:text="${estadioItem.capacidad + ' espectadores'}"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="mt-20">
+            <a href="/" class="btn-fifa">🏠 Volver al Dashboard</a>
+        </div>
+    </div>
+
+    <div id="contextMenu" class="context-menu">
+        <a id="editOption" href="#">✍️ Editar</a>
+        <a id="deleteOption" href="#" style="color: var(--fifa-red);">🗑️ Borrar</a>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const contextMenu = document.getElementById("contextMenu");
+            const editOption = document.getElementById("editOption");
+            const deleteOption = document.getElementById("deleteOption");
+
+            document.addEventListener("click", function() {
+                contextMenu.style.display = "none";
+            });
+
+            const rows = document.querySelectorAll(".estadio-row");
+            rows.forEach(row => {
+                row.addEventListener("contextmenu", function(e) {
+                    e.preventDefault();
+                    const estadioId = this.getAttribute("data-id");
+                    
+                    editOption.href = "/estadios/editar/" + estadioId;
+                    deleteOption.href = "/estadios/eliminar/" + estadioId;
+                    
+                    contextMenu.style.display = "block";
+                    contextMenu.style.left = e.pageX + "px";
+                    contextMenu.style.top = e.pageY + "px";
+                });
+            });
+
+            deleteOption.addEventListener("click", function(e) {
+                if(!confirm('¿Estás seguro de que quieres eliminar este estadio?')) {
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
