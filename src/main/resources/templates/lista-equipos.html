@@ -1,33 +1,97 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Simulador Mundial UMG</title>
+    <meta charset="UTF-8">
+    <title>Selecciones - FIFA UMG</title>
+    <!-- Vinculamos tu archivo CSS externo -->
     <link th:href="@{/css/fifa-style.css}" rel="stylesheet">
 </head>
 <body>
-    <div style="margin-top: 20px; margin-bottom: 20px;">
-        <a href="/" class="btn-fifa" style="display: inline-block; width: 200px; text-align: center;">Pagina Principal</a>
+
+    <div class="main-card">
+        <h1>SELECCIONES NACIONALES</h1>
+        <p>Gestión de países clasificados - Mundial 2026</p>
+
+        <!-- Mensaje de error (Ej. cuando no se puede borrar un equipo) -->
+        <div th:if="${error}" class="alert-error">
+            <span th:text="${error}"></span>
+        </div>
+
+        <!-- Botón para agregar nuevo (estilo FIFA) -->
+        <div class="text-right mb-20">
+            <a href="/equipos/nuevo" class="btn-fifa">
+                Registrar Nueva Selección
+            </a>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Bandera</th>
+                    <th>Nombre</th>
+                    <th>Abreviatura</th>
+                    <th>Director Técnico</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Usamos 'equipoItem' para evitar conflictos con palabras reservadas -->
+                <tr th:each="equipoItem : ${equipos}" class="equipo-row" th:data-id="${equipoItem.id}">
+                    <td th:text="${equipoItem.id}">1</td>
+                    <td></td> <!-- Espacio para futura bandera -->
+                    <td th:text="${equipoItem.nombre}" class="highlight-text"></td>
+                    <td th:text="${equipoItem.abreviatura}"></td>
+                    <td th:text="${equipoItem.entrenador}"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Botón de regreso -->
+        <div class="mt-20">
+            <a href="/" class="btn-fifa">Volver al Dashboard</a>
+        </div>
     </div>
-    <h1>Lista de Selecciones Clasificadas</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Abreviatura</th>
-                <th>Entrenador</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="equipo : ${equipos}">
-                <td th:text="${equipo.id}"></td>
-                <td th:text="${equipo.nombre}"></td>
-                <td th:text="${equipo.abreviatura}"></td>
-                <td th:text="${equipo.entrenador}"></td>
-            </tr>
-        </tbody>
-    </table>
-    <br>
-    <a href="/equipos/nuevo">Registrar nueva selección</a>
+
+    <!-- Menú contextual oculto por defecto -->
+    <div id="contextMenu" class="context-menu">
+        <a id="editOption" href="#">Editar</a>
+        <a id="deleteOption" href="#">Borrar</a>
+    </div>
+
+    <!-- Script para el menú contextual -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const contextMenu = document.getElementById("contextMenu");
+            const editOption = document.getElementById("editOption");
+            const deleteOption = document.getElementById("deleteOption");
+
+            // Ocultar el menú al hacer clic izquierdo en cualquier parte de la página
+            document.addEventListener("click", function() {
+                contextMenu.style.display = "none";
+            });
+
+            // Mostrar el menú al hacer clic derecho en una de las filas (equipo-row)
+            const rows = document.querySelectorAll(".equipo-row");
+            rows.forEach(row => {
+                row.addEventListener("contextmenu", function(e) {
+                    e.preventDefault();
+                    const equipoId = this.getAttribute("data-id");
+                    
+                    editOption.href = "/equipos/editar/" + equipoId;
+                    deleteOption.href = "/equipos/eliminar/" + equipoId;
+                    
+                    contextMenu.style.display = "block";
+                    contextMenu.style.left = e.pageX + "px";
+                    contextMenu.style.top = e.pageY + "px";
+                });
+            });
+
+            deleteOption.addEventListener("click", function(e) {
+                if(!confirm('¿Estás seguro de que quieres eliminar esta selección? Esto podría fallar si tiene jugadores asignados.')) {
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
 </body>
 </html>

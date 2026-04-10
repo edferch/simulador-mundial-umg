@@ -3,43 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <title>Nuevo Jugador</title>
+    <link th:href="@{/css/fifa-style.css}" rel="stylesheet">
 </head>
 <body>
-    <h2>Registrar Nuevo Jugador</h2>
-    
-    <!-- El formulario se enviará a la ruta /jugadores/guardar y enlazará con el objeto 'jugador' -->
-    <form th:action="@{/jugadores/guardar}" th:object="${jugador}" method="post">
+    <div class="main-card">
+        <h1>Registrar Nuevo Jugador</h1>
         
-        <div>
-            <label>Nombre:</label>
-            <input type="text" th:field="*{nombre}" required />
+        <form th:action="@{/jugadores/guardar}" th:object="${jugador}" method="post">
+            
+            <div>
+                <label>Nombre:</label>
+                <input type="text" th:field="*{nombre}" required />
+            </div>
+            <div>
+                <label>Posición:</label>
+                <input type="text" th:field="*{posicion}" placeholder="Ej: Portero, Delantero" />
+            </div>
+            <div>
+                <label>Número de Camiseta:</label>
+                <input type="number" th:field="*{numeroCamiseta}" />
+            </div>
+            <div>
+                <label>Equipo:</label>
+                <select th:field="*{equipo}" required>
+                    <option value="">Selecciona un equipo...</option>
+                    <option th:each="equipoItem : ${equipos}" th:value="${equipoItem.id}" th:text="${equipoItem.nombre}"></option>
+                </select>
+            </div>
+            <button type="submit" class="btn-fifa">Guardar Jugador</button>
+        </form>
+        
+        <div class="mt-20">
+            <a th:href="@{/jugadores}" class="btn-fifa">Volver a la lista</a>
         </div>
-        <br>
-        <div>
-            <label>Posición:</label>
-            <input type="text" th:field="*{posicion}" placeholder="Ej: Portero, Delantero" />
-        </div>
-        <br>
-        <div>
-            <label>Número de Camiseta:</label>
-            <input type="number" th:field="*{numeroCamiseta}" />
-        </div>
-        <br>
-        <div>
-            <label>Equipo:</label>
-            <select th:field="*{equipo}" required>
-                <option value="">Selecciona un equipo...</option>
-                <!-- Iteramos sobre la lista de equipos enviada desde el controlador -->
-                <option th:each="equipoItem : ${equipos}" th:value="${equipoItem.id}" th:text="${equipoItem.nombre}"></option>
-            </select>
-        </div>
-        <br>
-        <button type="submit">Guardar Jugador</button>
-    </form>
-    
-    <br>
-    <div style="margin-top: 20px; margin-bottom: 20px;">
-        <a th:href="@{/jugadores}" class="btn-fifa" style="display: inline-block;">Volver a la lista de jugadores</a>
     </div>
 </body>
 </html>
