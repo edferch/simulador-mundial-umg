@@ -3,95 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <title>Selecciones - FIFA UMG</title>
-    <!-- Vinculamos tu archivo CSS externo -->
     <link th:href="@{/css/fifa-style.css}" rel="stylesheet">
+    <style>
+        .selector-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 50px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(209, 245, 10, 0.1);
+            border-radius: 10px;
+        }
+        .nav-arrow {
+            font-size: 4rem;
+            color: var(--fifa-neon);
+            text-decoration: none;
+            transition: transform 0.2s;
+        }
+        .nav-arrow:hover { transform: scale(1.2); }
+        
+        .team-info-panel { text-align: center; min-width: 400px; }
+        .flag-box { width: 100px; height: 60px; background: var(--fifa-white); margin: 0 auto 15px; border: 3px solid white; box-shadow: 0 0 15px var(--fifa-neon); }
+    </style>
 </head>
-<body>
+<body style="background: var(--fifa-dark-bg);">
 
-    <div class="main-card">
-        <h1>SELECCIONES NACIONALES</h1>
-        <p>Gestión de países clasificados - Mundial 2026</p>
+    <div class="main-card" style="background: transparent; border: none;">
+        
+        <div class="selector-header">
+            <a th:href="@{/equipos(id=${idPrev})}" class="nav-arrow">◀</a>
+            
+            <div class="team-info-panel">
+                <div class="flag-box">
+                    <div style="width:100%; height:100%; background: var(--fifa-green); display:flex; align-items:center; justify-content:center; color:white; font-weight:bold;" th:text="${equipo.abreviatura}"></div>
+                </div>
+                <h1 style="font-size: 4rem; margin: 0; letter-spacing: 5px;" th:text="${equipo.nombre}">GUATEMALA</h1>
+                <p style="color: var(--fifa-neon); font-weight: bold; letter-spacing: 2px;" th:text="'DT: ' + ${equipo.entrenador}">ENTRENADOR</p>
+            </div>
 
-        <!-- Mensaje de error (Ej. cuando no se puede borrar un equipo) -->
-        <div th:if="${error}" class="alert-error">
-            <span th:text="${error}"></span>
+            <a th:href="@{/equipos(id=${idNext})}" class="nav-arrow">▶</a>
         </div>
 
-        <!-- Botón para agregar nuevo (estilo FIFA) -->
-        <div class="text-right mb-20">
-            <a href="/equipos/nuevo" class="btn-fifa">
-                Registrar Nueva Selección
-            </a>
+        <div class="pitch-container">
+            <div class="position-row">
+                <div th:each="j : ${jugadores}" th:if="${j.posicion == 'Delantero'}" class="fut-card">
+                    <p class="card-rating">85</p>
+                    <p class="card-pos">ST</p>
+                    <div class="card-number" th:text="${j.numeroCamiseta}">10</div>
+                    <p class="card-name" th:text="${j.nombre}">NOMBRE</p>
+                </div>
+            </div>
+            <div class="position-row">
+                <div th:each="j : ${jugadores}" th:if="${j.posicion == 'Mediocampista'}" class="fut-card" style="background: linear-gradient(135deg, #50C8FF 0%, #2D23D3 100%); color: white;">
+                    <p class="card-rating">82</p>
+                    <p class="card-pos">MC</p>
+                    <div class="card-number" th:text="${j.numeroCamiseta}">8</div>
+                    <p class="card-name" th:text="${j.nombre}">NOMBRE</p>
+                </div>
+            </div>
+            <div class="position-row">
+                <div th:each="j : ${jugadores}" th:if="${j.posicion == 'Defensa'}" class="fut-card" style="background: linear-gradient(135deg, #E8F4EC 0%, #005B3A 100%); color: white;">
+                    <p class="card-rating">79</p>
+                    <p class="card-pos">DF</p>
+                    <div class="card-number" th:text="${j.numeroCamiseta}">4</div>
+                    <p class="card-name" th:text="${j.nombre}">NOMBRE</p>
+                </div>
+            </div>
+            <div class="position-row">
+                <div th:each="j : ${jugadores}" th:if="${j.posicion == 'Portero'}" class="fut-card" style="background: linear-gradient(135deg, #ddd 0%, #555 100%); color: white;">
+                    <p class="card-rating">88</p>
+                    <p class="card-pos">GK</p>
+                    <div class="card-number" th:text="${j.numeroCamiseta}">1</div>
+                    <p class="card-name" th:text="${j.nombre}">NOMBRE</p>
+                </div>
+            </div>
         </div>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Bandera</th>
-                    <th>Nombre</th>
-                    <th>Abreviatura</th>
-                    <th>Director Técnico</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Usamos 'equipoItem' para evitar conflictos con palabras reservadas -->
-                <tr th:each="equipoItem : ${equipos}" class="equipo-row" th:data-id="${equipoItem.id}">
-                    <td th:text="${equipoItem.id}">1</td>
-                    <td></td> <!-- Espacio para futura bandera -->
-                    <td th:text="${equipoItem.nombre}" class="highlight-text"></td>
-                    <td th:text="${equipoItem.abreviatura}"></td>
-                    <td th:text="${equipoItem.entrenador}"></td>
-                </tr>
-            </tbody>
-        </table>
-
-        <!-- Botón de regreso -->
         <div class="mt-20">
             <a href="/" class="btn-fifa">Volver al Dashboard</a>
         </div>
     </div>
 
-    <!-- Menú contextual oculto por defecto -->
-    <div id="contextMenu" class="context-menu">
-        <a id="editOption" href="#">Editar</a>
-        <a id="deleteOption" href="#">Borrar</a>
-    </div>
-
-    <!-- Script para el menú contextual -->
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const contextMenu = document.getElementById("contextMenu");
-            const editOption = document.getElementById("editOption");
-            const deleteOption = document.getElementById("deleteOption");
-
-            // Ocultar el menú al hacer clic izquierdo en cualquier parte de la página
-            document.addEventListener("click", function() {
-                contextMenu.style.display = "none";
-            });
-
-            // Mostrar el menú al hacer clic derecho en una de las filas (equipo-row)
-            const rows = document.querySelectorAll(".equipo-row");
-            rows.forEach(row => {
-                row.addEventListener("contextmenu", function(e) {
-                    e.preventDefault();
-                    const equipoId = this.getAttribute("data-id");
-                    
-                    editOption.href = "/equipos/editar/" + equipoId;
-                    deleteOption.href = "/equipos/eliminar/" + equipoId;
-                    
-                    contextMenu.style.display = "block";
-                    contextMenu.style.left = e.pageX + "px";
-                    contextMenu.style.top = e.pageY + "px";
-                });
-            });
-
-            deleteOption.addEventListener("click", function(e) {
-                if(!confirm('¿Estás seguro de que quieres eliminar esta selección? Esto podría fallar si tiene jugadores asignados.')) {
-                    e.preventDefault();
-                }
-            });
-        });
-    </script>
 </body>
 </html>
