@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link th:href="@{/css/fifa-style.css}" rel="stylesheet">
+    <style>
+        .match-pitch {
+            background: #001a4d url('/img/pitch_lines.png'); /* Imagen de líneas de cancha */
+            height: 500px; position: relative; border: 2px solid rgba(255,255,255,0.2);
+        }
+        .player-dot {
+            position: absolute; width: 25px; height: 25px; border-radius: 50%;
+            color: white; font-size: 0.7rem; display: flex; align-items: center; 
+            justify-content: center; font-weight: bold; border: 2px solid white;
+        }
+        .rating-badge { padding: 2px 5px; border-radius: 3px; font-weight: bold; }
+    </style>
+</head>
+<body style="background: radial-gradient(circle, #001a4d, #000);">
+
+    <div class="main-card" style="background: transparent;">
+        <div style="display: flex; justify-content: center; align-items: center; gap: 50px;">
+            <h2 th:text="${encuentro.equipoLocal.nombre}"></h2>
+            <div class="score-display" style="font-size: 4rem;" th:text="${encuentro.golesLocal + ' - ' + encuentro.golesVisitante}">0 - 0</div>
+            <h2 th:text="${encuentro.equipoVisitante.nombre}"></h2>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 250px 1fr 250px; gap: 20px; margin-top: 30px;">
+            
+            <div>
+                <h4 style="color: var(--fifa-cyan);">LINEUP</h4>
+                <div th:each="j : ${plantillaLocal}" style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span th:text="${j.numeroCamiseta + ' ' + j.nombre}"></span>
+                    <span class="rating-badge" 
+                          th:style="${ratings.get(j.id) > 8 ? 'background: green' : 'background: orange'}"
+                          th:text="${#numbers.formatDecimal(ratings.get(j.id), 1, 1)}"></span>
+                </div>
+            </div>
+
+            <div class="match-pitch">
+                <div th:each="j, stat : ${plantillaLocal}" class="player-dot" 
+                     th:style="'top:' + (20 * stat.index + 10) + '%; left: 20%; background: red;'">
+                     <span th:text="${j.numeroCamiseta}"></span>
+                </div>
+                <div th:each="j, stat : ${plantillaVisitante}" class="player-dot" 
+                     th:style="'top:' + (20 * stat.index + 10) + '%; right: 20%; background: yellow; color: black;'">
+                     <span th:text="${j.numeroCamiseta}"></span>
+                </div>
+            </div>
+
+            <div>
+                <h4 style="color: var(--fifa-cyan);">LINEUP</h4>
+                <div th:each="j : ${plantillaVisitante}" style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span class="rating-badge" 
+                          th:style="${ratings.get(j.id) > 8 ? 'background: green' : 'background: orange'}"
+                          th:text="${#numbers.formatDecimal(ratings.get(j.id), 1, 1)}"></span>
+                    <span th:text="${j.nombre + ' ' + j.numeroCamiseta}"></span>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="/simulacion" class="btn-fifa">SALIR AL PANEL</a>
+        </div>
+    </div>
+</body>
+</html>
