@@ -1,31 +1,17 @@
 package com.umg.simulador_mundial.controller;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.umg.simulador_mundial.model.Encuentro;
-import com.umg.simulador_mundial.model.Equipo;
-import com.umg.simulador_mundial.model.Jugador;
-import com.umg.simulador_mundial.model.PosicionGrupo;
-import com.umg.simulador_mundial.repository.EncuentroRepository;
-import com.umg.simulador_mundial.repository.EquipoRepository;
-import com.umg.simulador_mundial.repository.JugadorRepository;
+import com.umg.simulador_mundial.model.*;
+import com.umg.simulador_mundial.repository.*;
 
 @Controller
 @RequestMapping("/simulacion")
@@ -40,9 +26,9 @@ public class SimulacionController {
     @Autowired
     private JugadorRepository jugadorRepository;
 
-    // ---------------------------------------------------------
-    // 1. CARGAR EL PANEL PRINCIPAL Y CALCULAR POSICIONES
-    // ---------------------------------------------------------
+    @Autowired
+    private EventoEncuentroRepository eventoRepository;
+
     @GetMapping
     public String cargarPanel(Model model) {
         List<Equipo> equipos = equipoRepository.findAll();
@@ -51,36 +37,26 @@ public class SimulacionController {
         boolean sorteoRealizado = equipos.stream().anyMatch(e -> e.getGrupo() != null);
         boolean faseGruposTerminada = !partidos.isEmpty() && partidos.stream().allMatch(p -> p.getEstado().equals("FINALIZADO"));
 
-        // LÓGICA DE FASE 2: Calcular tabla de posiciones usando Mapas y Listas
         Map<String, List<PosicionGrupo>> tablasPosiciones = new TreeMap<>(); 
 
         if (sorteoRealizado) {
-            // Inicializar la tabla en 0 para todos los equipos
             Map<Long, PosicionGrupo> calculoTemp = new HashMap<>();
             for (Equipo e : equipos) {
-                if (e.getGrupo() != null) {
-                    calculoTemp.put(e.getId(), new PosicionGrupo(e));
-                }
+                if (e.getGrupo() != null) calculoTemp.put(e.getId(), new PosicionGrupo(e));
             }
 
-            // Leer los partidos y sumar puntos/goles
             for (Encuentro p : partidos) {
                 if (p.getEstado().equals("FINALIZADO")) {
-                    PosicionGrupo local = calculoTemp.get(p.getEquipoLocal().getId());
-                    PosicionGrupo visitante = calculoTemp.get(p.getEquipoVisitante().getId());
-                    
-                    local.registrarPartido(p.getGolesLocal(), p.getGolesVisitante());
-                    visitante.registrarPartido(p.getGolesVisitante(), p.getGolesLocal());
+                    calculoTemp.get(p.getEquipoLocal().getId()).registrarPartido(p.getGolesLocal(), p.getGolesVisitante());
+                    calculoTemp.get(p.getEquipoVisitante().getId()).registrarPartido(p.getGolesVisitante(), p.getGolesLocal());
                 }
             }
 
-            // Agrupar por letra del grupo
             for (PosicionGrupo pos : calculoTemp.values()) {
                 String letraGrupo = pos.getEquipo().getGrupo();
                 tablasPosiciones.computeIfAbsent(letraGrupo, k -> new ArrayList<>()).add(pos);
             }
 
-            // Ordenar cada grupo (1ro, 2do, 3ro, 4to) según puntos y diferencia de goles
             for (List<PosicionGrupo> listaGrupo : tablasPosiciones.values()) {
                 Collections.sort(listaGrupo);
             }
@@ -93,25 +69,21 @@ public class SimulacionController {
         return "simulacion-dashboard";
     }
 
-    // ---------------------------------------------------------
-    // 2. EJECUTAR SORTEO Y CREAR CALENDARIO DE PARTIDOS
-    // ---------------------------------------------------------
     @PostMapping("/sortear")
     public String ejecutarSorteo() {
-        encuentroRepository.deleteAll(); // Limpiar torneo anterior
+        encuentroRepository.deleteAll();
+        eventoRepository.deleteAll();
         
         List<Equipo> equipos = equipoRepository.findAll();
-        Collections.shuffle(equipos); // Barajar equipos
+        Collections.shuffle(equipos);
         String[] letras = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"};
         
-        // Asignar los grupos
         for (int i = 0; i < equipos.size(); i++) {
             Equipo eq = equipos.get(i);
             eq.setGrupo(letras[i / 4]);
             equipoRepository.save(eq);
         }
 
-        // Crear los 6 partidos por grupo
         Map<String, List<Equipo>> grupos = equipoRepository.findAll().stream()
                 .filter(e -> e.getGrupo() != null)
                 .collect(Collectors.groupingBy(Equipo::getGrupo));
@@ -129,9 +101,6 @@ public class SimulacionController {
         return "redirect:/simulacion";
     }
 
-    // ---------------------------------------------------------
-    // 3. MOTOR DE SIMULACIÓN (Genera resultados y estadísticas)
-    // ---------------------------------------------------------
     @PostMapping("/jugar-grupos")
     public String simularFaseGrupos() {
         List<Encuentro> partidos = encuentroRepository.findAll();
@@ -139,83 +108,52 @@ public class SimulacionController {
 
         for (Encuentro p : partidos) {
             if (p.getEstado().equals("PENDIENTE")) {
-                int golesLocales = rand.nextInt(5);
-                int golesVisitantes = rand.nextInt(5);
-
-                p.setGolesLocal(golesLocales);
-                p.setGolesVisitante(golesVisitantes);
+                int gl = rand.nextInt(5);
+                int gv = rand.nextInt(5);
+                p.setGolesLocal(gl);
+                p.setGolesVisitante(gv);
                 p.setEstado("FINALIZADO");
                 encuentroRepository.save(p);
 
-                // Asignar los goles a los jugadores reales en la base de datos
-                asignarGolesAJugadores(p.getEquipoLocal(), golesLocales, golesVisitantes);
-                asignarGolesAJugadores(p.getEquipoVisitante(), golesVisitantes, golesLocales);
+                asignarGolesAJugadores(p, p.getEquipoLocal(), gl, gv);
+                asignarGolesAJugadores(p, p.getEquipoVisitante(), gv, gl);
             }
         }
         return "redirect:/simulacion";
     }
 
-    // ---------------------------------------------------------
-    // 4. MÉTODOS AUXILIARES
-    // ---------------------------------------------------------
-    private void crearPartido(Equipo local, Equipo visitante) {
-        Encuentro encuentro = new Encuentro();
-        encuentro.setEquipoLocal(local);
-        encuentro.setEquipoVisitante(visitante);
-        encuentro.setGolesLocal(0);
-        encuentro.setGolesVisitante(0);
-        encuentro.setEstado("PENDIENTE");
-        encuentro.setFechaHora(LocalDateTime.now());
-        encuentroRepository.save(encuentro);
-    }
-
-    private void asignarGolesAJugadores(Equipo equipo, int golesAnotados, int golesRecibidos) {
-        // Obtenemos a los jugadores que pertenecen a este equipo específico
-        List<Jugador> plantilla = jugadorRepository.findAll().stream()
-                .filter(j -> j.getEquipo().getId().equals(equipo.getId()))
-                .collect(Collectors.toList());
-        
-        if (plantilla.isEmpty()) return; // Si el equipo no tiene jugadores registrados, no hace nada
+    private void asignarGolesAJugadores(Encuentro encuentro, Equipo equipo, int golesAnotados, int golesRecibidos) {
+        List<Jugador> plantilla = jugadorRepository.findByEquipo(equipo);
+        if (plantilla.isEmpty()) return;
 
         Random rand = new Random();
-
-        // Repartir goles a favor entre la plantilla
         for (int i = 0; i < golesAnotados; i++) {
             Jugador goleador = plantilla.get(rand.nextInt(plantilla.size()));
-            // Evitamos que los porteros anoten goles si es posible
-            if (goleador.getPosicion() != null && goleador.getPosicion().equalsIgnoreCase("Portero") && plantilla.size() > 1) {
-                i--; // Repetir el ciclo para buscar a otro jugador
-                continue;
+            if (goleador.getPosicion().equalsIgnoreCase("Portero") && plantilla.size() > 1) {
+                i--; continue;
             }
             goleador.setGolesAnotados(goleador.getGolesAnotados() + 1);
             jugadorRepository.save(goleador);
+
+            eventoRepository.save(new EventoEncuentro("GOL", rand.nextInt(90) + 1, goleador, encuentro));
         }
 
-        // Sumar goles en contra al portero
         for (Jugador j : plantilla) {
-            if (j.getPosicion() != null && j.getPosicion().equalsIgnoreCase("Portero")) {
+            if (j.getPosicion().equalsIgnoreCase("Portero")) {
                 j.setGolesRecibidos(j.getGolesRecibidos() + golesRecibidos);
                 jugadorRepository.save(j);
-                break; // Solo afecta al primer portero que encuentre
+                break;
             }
         }
     }
-
-    // ---------------------------------------------------------
-    // 5. FASE FINAL: GENERAR OCTAVOS DE FINAL (Manejo de Excepciones)
-    // ---------------------------------------------------------
 
     @PostMapping("/generar-octavos")
     public String generarOctavos(RedirectAttributes flash) {
         try {
-            // 1. Volvemos a calcular las posiciones para saber quién pasó
             List<Equipo> equipos = equipoRepository.findAll();
             List<Encuentro> partidos = encuentroRepository.findAll();
-            
             Map<Long, PosicionGrupo> calculoTemp = new HashMap<>();
-            for (Equipo e : equipos) {
-                if (e.getGrupo() != null) calculoTemp.put(e.getId(), new PosicionGrupo(e));
-            }
+            for (Equipo e : equipos) if (e.getGrupo() != null) calculoTemp.put(e.getId(), new PosicionGrupo(e));
 
             for (Encuentro p : partidos) {
                 if (p.getEstado().equals("FINALIZADO")) {
@@ -225,90 +163,60 @@ public class SimulacionController {
             }
 
             Map<String, List<PosicionGrupo>> grupos = new HashMap<>();
-            for (PosicionGrupo pos : calculoTemp.values()) {
-                grupos.computeIfAbsent(pos.getEquipo().getGrupo(), k -> new ArrayList<>()).add(pos);
-            }
+            for (PosicionGrupo pos : calculoTemp.values()) grupos.computeIfAbsent(pos.getEquipo().getGrupo(), k -> new ArrayList<>()).add(pos);
 
-            // 2. Extraer a los 16 clasificados (12 primeros lugares + 4 mejores segundos)
-            List<PosicionGrupo> primerosLugares = new ArrayList<>();
-            List<PosicionGrupo> segundosLugares = new ArrayList<>();
-
+            List<PosicionGrupo> primeros = new ArrayList<>();
+            List<PosicionGrupo> segundos = new ArrayList<>();
             for (List<PosicionGrupo> lista : grupos.values()) {
-                Collections.sort(lista); // Ordenamos el grupo
-                if (lista.size() >= 1) primerosLugares.add(lista.get(0));
-                if (lista.size() >= 2) segundosLugares.add(lista.get(1));
+                Collections.sort(lista);
+                if (lista.size() >= 1) primeros.add(lista.get(0));
+                if (lista.size() >= 2) segundos.add(lista.get(1));
             }
 
-            // Ordenamos a los segundos lugares para sacar solo a los 4 mejores
-            Collections.sort(segundosLugares);
-            
+            Collections.sort(segundos);
             List<Equipo> clasificados = new ArrayList<>();
-            for (PosicionGrupo p : primerosLugares) clasificados.add(p.getEquipo());
-            for (int i = 0; i < 4; i++) clasificados.add(segundosLugares.get(i).getEquipo());
+            for (PosicionGrupo p : primeros) clasificados.add(p.getEquipo());
+            for (int i = 0; i < 4; i++) clasificados.add(segundos.get(i).getEquipo());
 
-            // 3. Crear los 8 cruces de Octavos de Final
-            Collections.shuffle(clasificados); // Barajamos para cruces al azar
-            
+            Collections.shuffle(clasificados);
             for (int i = 0; i < 16; i += 2) {
-                Encuentro octavos = new Encuentro();
-                octavos.setEquipoLocal(clasificados.get(i));
-                octavos.setEquipoVisitante(clasificados.get(i+1));
-                octavos.setEstado("OCTAVOS_PENDIENTE");
-                octavos.setFechaHora(LocalDateTime.now());
-                encuentroRepository.save(octavos);
+                Encuentro oct = new Encuentro();
+                oct.setEquipoLocal(clasificados.get(i));
+                oct.setEquipoVisitante(clasificados.get(i+1));
+                oct.setEstado("OCTAVOS_PENDIENTE");
+                oct.setFechaHora(LocalDateTime.now());
+                encuentroRepository.save(oct);
             }
-
             return "redirect:/simulacion/fase-final";
-
         } catch (Exception e) {
-            // CUMPLE RÚBRICA: Manejo de excepciones para evitar cierres inesperados
-            flash.addFlashAttribute("error", "Ocurrió un error al generar las llaves: " + e.getMessage());
+            flash.addFlashAttribute("error", "Error: " + e.getMessage());
             return "redirect:/simulacion";
         }
     }
 
-    // Ruta para ver la pantalla de eliminación directa
-    // ---------------------------------------------------------
-    // 6. VISTA DE ELIMINACIÓN DIRECTA Y REPORTES FINALES
-    // ---------------------------------------------------------
     @GetMapping("/fase-final")
     public String verFaseFinal(Model model) {
         List<Encuentro> todos = encuentroRepository.findAll();
-        
-        List<Encuentro> octavos = todos.stream().filter(p -> p.getEstado().contains("OCTAVOS")).collect(Collectors.toList());
-        List<Encuentro> cuartos = todos.stream().filter(p -> p.getEstado().contains("CUARTOS")).collect(Collectors.toList());
-        List<Encuentro> semis = todos.stream().filter(p -> p.getEstado().contains("SEMI")).collect(Collectors.toList());
-        List<Encuentro> finales = todos.stream().filter(p -> p.getEstado().contains("GRAN_FINAL")).collect(Collectors.toList());
-        
-        model.addAttribute("octavos", octavos);
-        model.addAttribute("cuartos", cuartos);
-        model.addAttribute("semis", semis);
-        model.addAttribute("finales", finales);
+        model.addAttribute("octavos", todos.stream().filter(p -> p.getEstado().contains("OCTAVOS")).collect(Collectors.toList()));
+        model.addAttribute("cuartos", todos.stream().filter(p -> p.getEstado().contains("CUARTOS")).collect(Collectors.toList()));
+        model.addAttribute("semis", todos.stream().filter(p -> p.getEstado().contains("SEMI")).collect(Collectors.toList()));
+        model.addAttribute("finales", todos.stream().filter(p -> p.getEstado().contains("GRAN_FINAL")).collect(Collectors.toList()));
 
-        // Si la Gran Final ya se jugó, generamos los Reportes (Cumple Rúbrica Fase 3)
-        boolean torneoTerminado = finales.stream().anyMatch(p -> p.getEstado().equals("GRAN_FINAL_FINALIZADO"));
-        model.addAttribute("torneoTerminado", torneoTerminado);
+        boolean terminado = todos.stream().anyMatch(p -> p.getEstado().equals("GRAN_FINAL_FINALIZADO"));
+        model.addAttribute("torneoTerminado", terminado);
 
-        if (torneoTerminado) {
-            Encuentro partidoFinal = finales.get(0);
-            Equipo campeon = partidoFinal.getGolesLocal() > partidoFinal.getGolesVisitante() ? partidoFinal.getEquipoLocal() : partidoFinal.getEquipoVisitante();
-            model.addAttribute("campeon", campeon);
-            
-            // Usamos las consultas SQL personalizadas que hicimos antes
+        if (terminado) {
+            Encuentro fin = todos.stream().filter(p -> p.getEstado().contains("GRAN_FINAL")).findFirst().get();
+            model.addAttribute("campeon", fin.getGolesLocal() > fin.getGolesVisitante() ? fin.getEquipoLocal() : fin.getEquipoVisitante());
             model.addAttribute("goleadores", jugadorRepository.findTop10ByOrderByGolesAnotadosDesc());
             model.addAttribute("porteros", jugadorRepository.findTop10ByPosicionOrderByGolesRecibidosAsc("Portero"));
         }
-        
         return "fase-final-logica";
     }
 
-    // ---------------------------------------------------------
-    // 7. MOTOR DE AVANCE DE LLAVES (Simulación de Rondas)
-    // ---------------------------------------------------------
     @PostMapping("/simular-llaves")
     public String simularLlaves(RedirectAttributes flash) {
         try {
-            // Buscamos qué fase está pendiente de jugarse
             List<Encuentro> pendientes = encuentroRepository.findAll().stream()
                     .filter(p -> p.getEstado().contains("PENDIENTE") && !p.getEstado().equals("PENDIENTE"))
                     .collect(Collectors.toList());
@@ -320,75 +228,68 @@ public class SimulacionController {
             Random rand = new Random();
 
             for (Encuentro p : pendientes) {
-                int golesLocales = rand.nextInt(5);
-                int golesVisitantes = rand.nextInt(5);
+                int gl = rand.nextInt(5);
+                int gv = rand.nextInt(5);
+                if (gl == gv) { if (rand.nextBoolean()) gl++; else gv++; }
 
-                // Lógica de Desempate (En eliminación directa alguien tiene que ganar)
-                if (golesLocales == golesVisitantes) {
-                    if (rand.nextBoolean()) golesLocales++; else golesVisitantes++;
-                }
-
-                p.setGolesLocal(golesLocales);
-                p.setGolesVisitante(golesVisitantes);
+                p.setGolesLocal(gl);
+                p.setGolesVisitante(gv);
                 p.setEstado(faseActual.replace("PENDIENTE", "FINALIZADO"));
                 encuentroRepository.save(p);
 
-                // Le sumamos los goles a los jugadores para los reportes
-                asignarGolesAJugadores(p.getEquipoLocal(), golesLocales, golesVisitantes);
-                asignarGolesAJugadores(p.getEquipoVisitante(), golesVisitantes, golesLocales);
+                asignarGolesAJugadores(p, p.getEquipoLocal(), gl, gv);
+                asignarGolesAJugadores(p, p.getEquipoVisitante(), gv, gl);
 
-                // Guardamos al ganador para la siguiente ronda
-                if (golesLocales > golesVisitantes) ganadores.add(p.getEquipoLocal());
-                else ganadores.add(p.getEquipoVisitante());
+                ganadores.add(gl > gv ? p.getEquipoLocal() : p.getEquipoVisitante());
             }
 
-            // Crear los cruces de la Siguiente Ronda
-            String siguienteFase = "";
-            if (faseActual.contains("OCTAVOS")) siguienteFase = "CUARTOS_PENDIENTE";
-            else if (faseActual.contains("CUARTOS")) siguienteFase = "SEMI_PENDIENTE";
-            else if (faseActual.contains("SEMI")) siguienteFase = "GRAN_FINAL_PENDIENTE";
+            String sig = "";
+            if (faseActual.contains("OCTAVOS")) sig = "CUARTOS_PENDIENTE";
+            else if (faseActual.contains("CUARTOS")) sig = "SEMI_PENDIENTE";
+            else if (faseActual.contains("SEMI")) sig = "GRAN_FINAL_PENDIENTE";
 
-            if (!siguienteFase.isEmpty()) {
+            if (!sig.isEmpty()) {
                 for (int i = 0; i < ganadores.size(); i += 2) {
-                    Encuentro nuevo = new Encuentro();
-                    nuevo.setEquipoLocal(ganadores.get(i));
-                    nuevo.setEquipoVisitante(ganadores.get(i + 1));
-                    nuevo.setEstado(siguienteFase);
-                    nuevo.setFechaHora(LocalDateTime.now());
-                    encuentroRepository.save(nuevo);
+                    Encuentro n = new Encuentro();
+                    n.setEquipoLocal(ganadores.get(i));
+                    n.setEquipoVisitante(ganadores.get(i + 1));
+                    n.setEstado(sig);
+                    n.setFechaHora(LocalDateTime.now());
+                    encuentroRepository.save(n);
                 }
             }
-
             return "redirect:/simulacion/fase-final";
-
         } catch (Exception e) {
-            flash.addFlashAttribute("error", "Error crítico al simular la llave: " + e.getMessage());
+            flash.addFlashAttribute("error", "Error: " + e.getMessage());
             return "redirect:/simulacion/fase-final";
         }
     }
 
     @GetMapping("/partido/{id}")
-    public String verSimulacionPartido(@PathVariable Long id, Model model){
+    public String verSimulacionPartido(@PathVariable Long id, Model model) {
         Encuentro encuentro = encuentroRepository.findById(id).orElseThrow();
-
-        //generar eventos aleatorios
-        //Usar un map para pasar datos de rendimiento a la vista
         Map<Long, Double> ratings = new HashMap<>();
         List<Jugador> todos = new ArrayList<>();
         todos.addAll(jugadorRepository.findByEquipo(encuentro.getEquipoLocal()));
         todos.addAll(jugadorRepository.findByEquipo(encuentro.getEquipoVisitante()));
 
         Random rand = new Random();
-        for(Jugador j : todos){
-            ratings.put(j.getId(), 5.0 + (5.0 * rand.nextDouble())); //Rating de 5 a 10
-        }
+        for(Jugador j : todos) ratings.put(j.getId(), 5.0 + (5.0 * rand.nextDouble()));
 
         model.addAttribute("encuentro", encuentro);
         model.addAttribute("ratings", ratings);
+        model.addAttribute("eventos", eventoRepository.findByEncuentroOrderByMinutoAsc(encuentro));
         model.addAttribute("plantillaLocal", jugadorRepository.findByEquipo(encuentro.getEquipoLocal()));
         model.addAttribute("plantillaVisitante", jugadorRepository.findByEquipo(encuentro.getEquipoVisitante()));
-        
         return "partido-simulacion";
+    }
 
+    private void crearPartido(Equipo local, Equipo visitante) {
+        Encuentro e = new Encuentro();
+        e.setEquipoLocal(local);
+        e.setEquipoVisitante(visitante);
+        e.setEstado("PENDIENTE");
+        e.setFechaHora(LocalDateTime.now());
+        encuentroRepository.save(e);
     }
 }
