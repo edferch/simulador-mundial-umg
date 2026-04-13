@@ -4,46 +4,178 @@
     <meta charset="UTF-8">
     <title>Match Day - FIFA UMG</title>
     <link th:href="@{/css/fifa-style.css}" rel="stylesheet">
+    <style>
+        .player-dot { 
+            transition: all 1.8s ease-in-out; /* Transición suave para el regreso */
+            z-index: 5; 
+            position: absolute;
+            width: 25px; height: 25px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; border: 2px solid white; font-size: 0.7rem;
+        }
+        .event-hidden { display: none; }
+        .match-pitch { 
+            overflow: hidden; position: relative; height: 500px; 
+            border: 3px solid rgba(255,255,255,0.3);
+            background: linear-gradient(to bottom, #001a4d 0%, #000 100%);
+        }
+        #live-clock { color: var(--fifa-neon); font-size: 2.5rem; font-weight: 900; margin-bottom: 5px; }
+        
+        .goal-flash-active { 
+            animation: quickFlash 0.5s ease-out; 
+            box-shadow: 0 0 30px #F8C301; 
+            border: 3px solid #F8C301 !important;
+            scale: 1.4;
+        }
+        @keyframes quickFlash { 
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
 </head>
 <body style="background: radial-gradient(circle, #001a4d, #000);">
 
     <div class="main-card" style="background: transparent;">
-        <div style="display: flex; justify-content: center; align-items: center; gap: 50px;">
-            <h2 th:text="${encuentro.equipoLocal.nombre}" style="color: white; font-style: italic;"></h2>
-            <div class="score-display" style="font-size: 5rem;" th:text="${encuentro.golesLocal + ' - ' + encuentro.golesVisitante}">0 - 0</div>
-            <h2 th:text="${encuentro.equipoVisitante.nombre}" style="color: white; font-style: italic;"></h2>
+        <div style="text-align: center;">
+            <div id="live-clock">00'</div>
+            <div style="display: flex; justify-content: center; align-items: center; gap: 50px;">
+                <h2 th:text="${encuentro.equipoLocal.nombre}" style="color: white; font-style: italic;"></h2>
+                <div class="score-display" style="font-size: 5rem; min-width: 220px;">
+                    <span id="score-local">0</span> - <span id="score-visit">0</span>
+                </div>
+                <h2 th:text="${encuentro.equipoVisitante.nombre}" style="color: white; font-style: italic;"></h2>
+            </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 280px 1fr 280px; gap: 30px; margin-top: 30px;">
-            
+        <div style="display: grid; grid-template-columns: 280px 1fr 280px; gap: 30px; margin-top: 20px;">
             <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 8px;">
-                <h4 style="color: var(--fifa-cyan);">LINEUP</h4>
-                <div th:each="j : ${plantillaLocal}" style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <h4 style="color: var(--fifa-cyan);">PLANTILLA LOCAL</h4>
+                <div th:each="j : ${plantillaLocal}" style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.8rem;">
                     <span th:text="${j.numeroCamiseta + ' ' + j.nombre}"></span>
                     <span style="color: var(--fifa-neon); font-weight: bold;" th:text="${#numbers.formatDecimal(ratings.get(j.id), 1, 1)}"></span>
                 </div>
             </div>
 
-            <div class="match-pitch">
-                <div th:each="j, stat : ${plantillaLocal}" class="player-dot" 
-                     th:style="|top: ${15 * stat.index + 8}%; left: 20%; background: #EA0036;|" th:text="${j.numeroCamiseta}"></div>
-                <div th:each="j, stat : ${plantillaVisitante}" class="player-dot" 
-                     th:style="|top: ${15 * stat.index + 8}%; right: 20%; background: #F8C301; color: black;|" th:text="${j.numeroCamiseta}"></div>
+            <div class="match-pitch" id="pitch">
+                <div th:each="j, stat : ${plantillaLocal}" 
+                     class="player-dot dot-local" 
+                     th:data-pos="${j.posicion}"
+                     th:style="|top: ${j.posicion == 'Portero' ? '45%' : (15 * stat.index + 10) + '%'}; left: ${j.posicion == 'Portero' ? '3%' : '20%'}; background: #EA0036;|" 
+                     th:text="${j.numeroCamiseta}"></div>
+                
+                <div th:each="j, stat : ${plantillaVisitante}" 
+                     class="player-dot dot-visit" 
+                     th:data-pos="${j.posicion}"
+                     th:style="|top: ${j.posicion == 'Portero' ? '45%' : (15 * stat.index + 10) + '%'}; left: ${j.posicion == 'Portero' ? '97%' : '80%'}; background: #F8C301; color: black;|" 
+                     th:text="${j.numeroCamiseta}"></div>
             </div>
 
             <div style="background: rgba(0,0,0,0.5); padding: 20px; border-radius: 8px;">
-                <h4 style="color: var(--fifa-neon);">MATCH EVENTS</h4>
-                <div th:each="ev : ${eventos}" style="margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 5px;">
-                    <span th:text="${ev.minuto} + '\''" style="color: var(--fifa-cyan); font-weight: 900;"></span> ⚽
-                    <span th:text="${ev.jugador.nombre}" style="color: white;"></span>
+                <h4 style="color: var(--fifa-neon);">CRONOLOGÍA</h4>
+                <div id="events-container">
+                    <div th:each="ev : ${eventos}" class="match-event-row event-hidden" 
+                         th:data-minuto="${ev.minuto}" th:data-equipo="${ev.jugador.equipo.id}">
+                        <div style="margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 5px;">
+                            <span th:text="${ev.minuto} + '\''" style="color: var(--fifa-cyan); font-weight: 900;"></span> ⚽
+                            <span th:text="${ev.jugador.nombre}" style="color: white;"></span>
+                        </div>
+                    </div>
                 </div>
-                <div th:if="${#lists.isEmpty(eventos)}" style="color: gray;">Sin eventos registrados</div>
             </div>
         </div>
 
-        <div style="text-align: center; margin-top: 50px;">
-            <a href="/simulacion/fase-final" class="btn-fifa" style="background: white; color: black;">REGRESAR AL CUADRO</a>
+        <div style="text-align: center; margin-top: 40px;">
+            <a href="/simulacion/fase-final" class="btn-fifa" style="background: white; color: black; display: none;" id="btn-back">REGRESAR AL CUADRO</a>
         </div>
     </div>
+
+    <script th:inline="javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            let minute = 0;
+            const clockEl = document.getElementById("live-clock");
+            const scoreLocalEl = document.getElementById("score-local");
+            const scoreVisitEl = document.getElementById("score-visit");
+            const eventRows = document.querySelectorAll(".match-event-row");
+            const allDots = document.querySelectorAll(".player-dot");
+            const localId = [[${encuentro.equipoLocal.id}]];
+            
+            // Guardamos las posiciones iniciales para el regreso
+            const initialPositions = [];
+            allDots.forEach(dot => {
+                initialPositions.push({
+                    el: dot,
+                    top: dot.style.top,
+                    left: dot.style.left
+                });
+            });
+
+            let curScoreL = 0;
+            let curScoreV = 0;
+
+            // 1. Motor de Movimiento (Solo para jugadores de campo)
+            const moveInterval = setInterval(() => {
+                allDots.forEach(dot => {
+                    if (dot.dataset.pos === 'Portero') return;
+
+                    let currentLeft = parseFloat(dot.style.left);
+                    let currentTop = parseFloat(dot.style.top);
+
+                    let deltaX = (Math.random() * 24 - 12);
+                    let deltaY = (Math.random() * 18 - 9);
+
+                    dot.style.left = Math.max(5, Math.min(92, currentLeft + deltaX)) + "%";
+                    dot.style.top = Math.max(5, Math.min(90, currentTop + deltaY)) + "%";
+                });
+            }, 1800);
+
+            // 2. Motor del Reloj (400ms por minuto)
+            const matchInterval = setInterval(() => {
+                minute++;
+                clockEl.innerText = minute + "'";
+
+                eventRows.forEach(row => {
+                    if (parseInt(row.dataset.minuto) === minute) {
+                        row.classList.remove("event-hidden");
+                        
+                        if (parseInt(row.dataset.equipo) === localId) {
+                            curScoreL++;
+                            scoreLocalEl.innerText = curScoreL;
+                        } else {
+                            curScoreV++;
+                            scoreVisitEl.innerText = curScoreV;
+                        }
+
+                        // Efecto de gol rápido
+                        const teamClass = (parseInt(row.dataset.equipo) === localId) ? ".dot-local" : ".dot-visit";
+                        const teamDots = document.querySelectorAll(teamClass + "[data-pos!='Portero']");
+                        const scorer = teamDots[Math.floor(Math.random() * teamDots.length)];
+                        
+                        scorer.classList.add("goal-flash-active");
+                        if (parseInt(row.dataset.equipo) === localId) scorer.style.left = "94%";
+                        else scorer.style.left = "6%";
+
+                        setTimeout(() => scorer.classList.remove("goal-flash-active"), 1200);
+                    }
+                });
+
+                if (minute >= 90) {
+                    clearInterval(matchInterval);
+                    clearInterval(moveInterval); // Detenemos el movimiento caótico
+                    
+                    clockEl.innerText = "FINAL";
+                    
+                    // ORDEN DE REGRESO: Todos los jugadores vuelven a su sitio original
+                    initialPositions.forEach(pos => {
+                        pos.el.style.left = pos.top; // Error de dedo corregido abajo
+                        pos.el.style.left = pos.left;
+                        pos.el.style.top = pos.top;
+                    });
+
+                    document.getElementById("btn-back").style.display = "inline-block";
+                }
+            }, 400); 
+        });
+    </script>
 </body>
 </html>

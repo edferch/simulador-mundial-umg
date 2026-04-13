@@ -25,7 +25,6 @@
         </div>
 
         <div class="bracket-wrapper-split">
-            
             <div class="bracket-side-group side-left">
                 <div class="round-column">
                     <div style="text-align: center; color: #555; font-size: 0.7rem; margin-bottom: 10px; letter-spacing: 2px;">OCTAVOS IZQ</div>
@@ -110,9 +109,39 @@
             </div>
         </div>
 
-        <div th:if="${torneoTerminado}" style="margin-top: 50px; text-align: center;">
-            <a href="/simulacion" class="btn-fifa">VOLVER AL PANEL</a>
+        <div th:if="${torneoTerminado}" style="margin-top: 50px; padding: 40px; background: rgba(209, 245, 10, 0.05); border: 2px solid var(--fifa-neon); border-radius: 12px; text-align: center;">
+            <h1 style="color: var(--fifa-neon); font-size: 3rem; margin-bottom: 0;">🎉 ¡NUEVO CAMPEÓN MUNDIAL! 🎉</h1>
+            <h1 th:text="${campeon.nombre}" style="font-size: 5rem; color: white; margin-top: 10px; text-shadow: 0 0 30px var(--fifa-neon);"></h1>
+            
+            <div style="display: flex; justify-content: space-around; margin-top: 50px; text-align: left;">
+                <div style="background: rgba(0,0,0,0.4); padding: 25px; border-radius: 10px; width: 45%; border-left: 5px solid var(--fifa-red);">
+                    <h2 style="color: var(--fifa-red); text-transform: uppercase; font-style: italic;">⚽ BOTA DE ORO</h2>
+                    <div th:each="j, stat : ${goleadores}" th:if="${stat.index < 5}" style="margin-bottom: 10px; font-size: 1.2rem; border-bottom: 1px solid #333; padding-bottom: 5px;">
+                        <span th:text="${j.nombre}" style="font-weight: bold;"></span> 
+                        <span style="color: gray; font-size: 0.9rem;" th:text="'(' + ${j.equipo.abreviatura} + ')'"></span>
+                        <span style="float: right; color: var(--fifa-neon);" th:text="${j.golesAnotados} + ' G'"></span>
+                    </div>
+                </div>
+
+                <div style="background: rgba(0,0,0,0.4); padding: 25px; border-radius: 10px; width: 45%; border-left: 5px solid var(--fifa-cyan);">
+                    <h2 style="color: var(--fifa-cyan); text-transform: uppercase; font-style: italic;">🧤 GUANTE DE ORO</h2>
+                    <div th:each="p, stat : ${porteros}" th:if="${stat.index < 5}" style="margin-bottom: 10px; font-size: 1.2rem; border-bottom: 1px solid #333; padding-bottom: 5px;">
+                        <span th:text="${p.nombre}" style="font-weight: bold;"></span>
+                        <span style="color: gray; font-size: 0.9rem;" th:text="'(' + ${p.equipo.abreviatura} + ')'"></span>
+                        <span style="float: right; color: var(--fifa-cyan);" th:text="${p.golesRecibidos} + ' GR'"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-20">
+                <a href="/simulacion" class="btn-fifa" style="background: white; color: black; padding: 15px 50px;">REPETIR TORNEO</a>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 40px;">
+            <a href="/simulacion" class="btn-fifa" style="background: #333; border: 1px solid #555;">← VOLVER AL PANEL</a>
         </div>
     </div>
+
 </body>
 </html>
