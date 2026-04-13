@@ -2,34 +2,41 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Resultados - FIFA UMG</title>
+    <title>Calendario - FIFA UMG</title>
     <link th:href="@{/css/fifa-style.css}" rel="stylesheet">
 </head>
-<body style="background: var(--fifa-dark-bg);">
+<body style="background: linear-gradient(to bottom, #001a4d, #000b21); min-height: 100vh;">
 
-    <div class="main-card" style="background: transparent; border: none; box-shadow: none; text-align: left; padding: 20px;">
-        <div style="margin-bottom: 40px;">
-            <a href="/" class="btn-fifa" style="background: #333; border: 1px solid #555;">← VOLVER</a>
+    <div class="main-card" style="background: transparent; border: none; box-shadow: none; padding: 10px;">
+        
+        <div style="text-align: center; margin-bottom: 40px;">
+            <div style="background: #001a4d; display: inline-block; padding: 10px 30px; border-radius: 10px; border: 1px solid #005B3A;">
+                <p style="color: white; margin: 0; font-size: 0.8rem; letter-spacing: 2px;">CALENDARIO OFICIAL</p>
+                <h1 style="color: white; margin: 0; font-size: 2.5rem; font-style: italic;">MUNDIAL 2026</h1>
+            </div>
         </div>
 
-        <h1 style="color: white; font-style: italic; margin-left: 5%;">CALENDARIO Y RESULTADOS</h1>
-        <p style="color: var(--fifa-cyan); margin-left: 5%; font-weight: bold; letter-spacing: 2px;">WORLD CUP 2026™ STADIUM FEED</p>
-
-        <div class="results-container">
-            <div th:each="p : ${encuentros}" class="match-result-card">
+        <div class="calendar-view">
+            <div th:each="partido : ${encuentros}" class="calendar-row">
                 
-                <div class="team-name-display team-local" th:text="${p.equipoLocal.nombre}">EQUIPO A</div>
-                
-                <div style="text-align: center;">
-                    <div class="score-display">
-                        <span th:text="${p.golesLocal}">0</span>:<span th:text="${p.golesVisitante}">0</span>
-                    </div>
-                    <span class="match-status-tag" th:text="${p.estado}">FINALIZADO</span>
+                <div class="stadium-tag">
+                    🏟️ ESTADIO MUNDIALISTA UMG
                 </div>
 
-                <div class="team-name-display team-visitante" th:text="${p.equipoVisitante.nombre}">EQUIPO B</div>
-                
+                <div class="teams-info-bar">
+                    <div class="team-display-name" th:text="${partido.equipoLocal.nombre}">LOCAL</div>
+                    
+                    <div class="vs-badge">VS</div>
+                    
+                    <div class="team-display-name" th:text="${partido.equipoVisitante.nombre}">VISITANTE</div>
+                </div>
+
             </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 50px;">
+            <a href="/" class="btn-fifa" style="background: var(--fifa-red);">REGRESAR AL MENÚ</a>
+            <p style="color: var(--fifa-cyan); font-weight: bold; margin-top: 20px;">DISFRUTÁ TODOS LOS PARTIDOS POR FIFA UMG SIMULATOR</p>
         </div>
     </div>
 

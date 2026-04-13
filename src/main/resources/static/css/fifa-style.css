@@ -251,3 +251,74 @@ h1 {
 .context-menu a:hover { background: var(--fifa-cyan); color: black; }
 
 .alert-error { background: var(--fifa-red); color: white; padding: 15px; border-radius: 5px; text-align: center; font-weight: bold; }
+
+/* =========================================
+   CALENDARIO (IMAGEN 7)
+   ========================================= */
+.calendar-view {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.calendar-row {
+    display: flex;
+    margin-bottom: 10px;
+    height: 55px; /* Altura de la tira en la imagen */
+    align-items: stretch;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.stadium-tag {
+    background: #F8C301; /* El amarillo vibrante de la imagen */
+    color: #000;
+    width: 250px; /* Espacio para el nombre del estadio */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    padding: 0 15px;
+    text-align: center;
+    border-radius: 4px 0 0 4px;
+    line-height: 1.1;
+}
+
+.teams-info-bar {
+    background: #000b21; /* Azul casi negro de la tira */
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    position: relative;
+}
+
+/* El divisor VS en cyan */
+.vs-badge {
+    color: var(--fifa-cyan);
+    font-weight: 900;
+    font-size: 1.1rem;
+    font-style: italic;
+}
+
+.team-display-name {
+    color: white;
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 1.2rem;
+    width: 200px;
+    text-align: center;
+    letter-spacing: 1px;
+}
+
+/* Decoración FIFA 26 al final de la fila */
+.teams-info-bar::after {
+    content: 'FIFA';
+    position: absolute;
+    right: 20px;
+    color: rgba(255,255,255,0.2);
+    font-weight: 900;
+    font-size: 0.8rem;
+}
