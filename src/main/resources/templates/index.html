@@ -5,7 +5,7 @@
     <title>FIFA World Cup 2026 - UMG</title>
     <link th:href="@{/css/fifa-style.css}" rel="stylesheet">
 </head>
-<body>
+<body style="background: var(--fifa-dark-bg);">
 
     <div style="text-align: center; margin-top: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px;">
         <h1 style="color: var(--fifa-white); text-shadow: 0 0 15px rgba(255,255,255,0.3); font-style: italic; margin-bottom: 0;">FIFA WORLD CUP 2026™</h1>
@@ -16,23 +16,30 @@
         
         <a href="/simulacion" class="menu-tile tile-simulacion">
             <span class="tile-icon">🏆</span>
-            <span>MODO TORNEO</span>
+            <span style="letter-spacing: 2px;">MODO TORNEO</span>
+            <small style="font-size: 0.8rem; color: rgba(255,255,255,0.6); font-style: normal; margin-top: 10px;">Simula la fase de grupos y eliminación directa</small>
         </a>
 
-        <a href="/equipos" class="menu-tile">
+        <a href="/equipos" class="menu-tile" style="background: linear-gradient(135deg, #005B3A 0%, #000 100%);">
             <span class="tile-icon">🌍</span>
             <span>SELECCIONES</span>
         </a>
 
-        <a href="/estadios" class="menu-tile" style="grid-column: span 2;">
-            <span class="tile-icon">🏟️</span>
-            <span>GESTIÓN DE SEDES</span>
+        <a href="/encuentros" class="menu-tile" style="background: linear-gradient(135deg, #F8C301 0%, #000 100%);">
+            <span class="tile-icon" style="color: black;">🗓️</span>
+            <span style="color: var(--fifa-white);">CALENDARIO</span>
+        </a>
+
+        <a href="/estadios" class="menu-tile" style="grid-column: span 3; min-height: 120px; flex-direction: row; gap: 20px;">
+            <span class="tile-icon" style="margin-bottom: 0;">🏟️</span>
+            <span>GESTIÓN DE SEDES Y ESTADIOS</span>
         </a>
 
     </div>
 
-    <div style="text-align: center; margin-top: 40px; color: gray; font-size: 0.9rem; font-weight: bold;">
-        <span style="background: white; color: black; padding: 2px 8px; border-radius: 50%; margin-right: 5px;">A</span> SELECCIONAR
+    <div style="position: fixed; bottom: 20px; left: 0; right: 0; text-align: center; color: rgba(255,255,255,0.3); font-size: 0.8rem; font-weight: bold; text-transform: uppercase; letter-spacing: 2px;">
+        <span style="background: white; color: black; padding: 2px 8px; border-radius: 50%; margin-right: 5px;">A</span> Seleccionar | 
+        <span style="background: white; color: black; padding: 2px 8px; border-radius: 50%; margin-right: 5px; margin-left: 15px;">B</span> Atrás
     </div>
 
 </body>
