@@ -393,3 +393,38 @@ h1 {
     background-image: radial-gradient(circle at center, transparent 0, transparent 60px, rgba(255,255,255,0.1) 61px, transparent 62px);
 }
 .player-dot { position: absolute; width: 28px; height: 28px; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white; }
+
+/* Menú de Clic Derecho Estilo FIFA */
+.context-menu {
+    display: none;
+    position: absolute;
+    background: #111; /* Color oscuro como el fondo del dashboard */
+    border: 1px solid var(--fifa-cyan);
+    box-shadow: 0 0 15px rgba(0, 255, 204, 0.4);
+    z-index: 1000;
+    min-width: 160px;
+    border-radius: 4px;
+    padding: 5px 0;
+}
+
+.context-menu-item {
+    padding: 10px 20px;
+    cursor: pointer;
+    color: white;
+    font-size: 0.9rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.2s;
+}
+
+.context-menu-item:hover {
+    background: var(--fifa-cyan);
+    color: black;
+}
+
+.context-menu-item.delete:hover {
+    background: var(--fifa-red);
+    color: white;
+}
