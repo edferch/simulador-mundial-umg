@@ -98,7 +98,7 @@
             const scoreVisitEl = document.getElementById("score-visit");
             const eventRows = document.querySelectorAll(".match-event-row");
             const allDots = document.querySelectorAll(".player-dot");
-            const localId = [[${encuentro.equipoLocal.id}]];
+            const localId = /*[[${encuentro.equipoLocal.id}]]*/ 0;
             
             // Guardamos las posiciones iniciales para el regreso
             const initialPositions = [];
@@ -167,7 +167,6 @@
                     
                     // ORDEN DE REGRESO: Todos los jugadores vuelven a su sitio original
                     initialPositions.forEach(pos => {
-                        pos.el.style.left = pos.top; // Error de dedo corregido abajo
                         pos.el.style.left = pos.left;
                         pos.el.style.top = pos.top;
                     });
