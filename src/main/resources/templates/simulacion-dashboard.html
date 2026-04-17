@@ -18,7 +18,7 @@
         </div>
 
         <div th:if="${error}" class="alert-error" style="max-width: 800px; margin: 0 auto 20px auto;">
-            ⚠️ <b>ERROR DEL SISTEMA:</b> <span th:text="${error}"></span>
+            <b>ERROR DEL SISTEMA:</b> <span th:text="${error}"></span>
         </div>
 
         <div th:if="${!sorteoRealizado}" style="text-align: center; padding: 60px 0;">
@@ -26,7 +26,7 @@
             <p style="color: #888;">Debes realizar el sorteo oficial para definir los 12 grupos de 4 selecciones.</p>
             <form th:action="@{/simulacion/sortear}" method="post">
                 <button type="submit" class="btn-fifa" style="background-color: var(--fifa-red); font-size: 1.2rem; padding: 15px 40px;">
-                    🎲 REALIZAR SORTEO OFICIAL
+                    REALIZAR SORTEO OFICIAL
                 </button>
             </form>
         </div>
@@ -38,13 +38,13 @@
                 <p style="color: #ccc;">Hay 72 encuentros pendientes en el calendario oficial.</p>
                 <form th:action="@{/simulacion/jugar-grupos}" method="post">
                     <button type="submit" class="btn-fifa" style="background-color: var(--fifa-red); font-size: 1.1rem;">
-                        ⚽ SIMULAR TODOS LOS PARTIDOS
+                        SIMULAR TODOS LOS PARTIDOS
                     </button>
                 </form>
             </div>
 
             <div th:if="${faseGruposTerminada}" style="background: rgba(0, 255, 204, 0.1); border: 1px solid var(--fifa-cyan); padding: 20px; border-radius: 8px; margin-bottom: 30px; text-align: center;">
-                <h2 style="color: var(--fifa-white); margin-top: 0;">✅ FASE DE GRUPOS FINALIZADA</h2>
+                <h2 style="color: var(--fifa-white); margin-top: 0;">FASE DE GRUPOS FINALIZADA</h2>
                 <p style="color: #ccc;">Los clasificados han sido definidos según puntos y diferencia de goles.</p>
                 <form th:action="@{/simulacion/generar-octavos}" method="post">
                     <button type="submit" class="btn-fifa" style="background-color: var(--fifa-cyan); color: black; font-size: 1.1rem;">
