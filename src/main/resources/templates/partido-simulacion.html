@@ -77,7 +77,7 @@
                     <div th:each="ev : ${eventos}" class="match-event-row event-hidden" 
                          th:data-minuto="${ev.minuto}" th:data-equipo="${ev.jugador.equipo.id}">
                         <div style="margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 5px;">
-                            <span th:text="${ev.minuto} + '\''" style="color: var(--fifa-cyan); font-weight: 900;"></span> ⚽
+                            <span th:text="${ev.minuto} + '\''" style="color: var(--fifa-cyan); font-weight: 900;"></span> 
                             <span th:text="${ev.jugador.nombre}" style="color: white;"></span>
                         </div>
                     </div>
@@ -98,7 +98,7 @@
             const scoreVisitEl = document.getElementById("score-visit");
             const eventRows = document.querySelectorAll(".match-event-row");
             const allDots = document.querySelectorAll(".player-dot");
-            const localId = [[${encuentro.equipoLocal.id}]];
+            const localId = /*[[${encuentro.equipoLocal.id}]]*/ 0;
             
             // Guardamos las posiciones iniciales para el regreso
             const initialPositions = [];
@@ -167,7 +167,6 @@
                     
                     // ORDEN DE REGRESO: Todos los jugadores vuelven a su sitio original
                     initialPositions.forEach(pos => {
-                        pos.el.style.left = pos.top; // Error de dedo corregido abajo
                         pos.el.style.left = pos.left;
                         pos.el.style.top = pos.top;
                     });

@@ -1,6 +1,3 @@
--- =========================================================
--- REGISTRO DE LAS 48 SELECCIONES (ORDEN SOLICITADO)
--- =========================================================
 INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Canadá', 'CAN', 'Jesse Marsch');
 INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Estados Unidos', 'USA', 'Mauricio Pochettino');
 INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('México', 'MEX', 'Javier Aguirre');
@@ -45,10 +42,10 @@ INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Uzbekistán', 'UZ
 INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Jordania', 'JOR', 'Jamal Sellami');
 INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Irak', 'IRQ', 'Jesús Casas');
 INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Panamá', 'PAN', 'Thomas Christiansen');
-INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Guatemala', 'GUA', 'Luis Fernando Tena');
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Venezuela', 'VEN', 'Fernando Batista');
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Guatemala', 'GUA', 'Eder Fernando Chacón');
 INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Curazao', 'CUW', 'Dick Advocaat');
-INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Nueva Zelanda', 'NZL', 'Darren Bazeley');
-INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Venezuela', 'VEN', 'Fernando Batista'); -- Añadido para completar 48
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Nueva Zelanda', 'NZL', 'Darren Bazeley');-- Añadido para completar 48
 
 <<<<<<< HEAD
 -- CARGA MASIVA DE JUGADORES (Fase 1)
@@ -1255,7 +1252,7 @@ INSERT INTO jugadores (nombre, posicion, numero_camiseta, equipo_id) VALUES ('Jo
 INSERT INTO jugadores (nombre, posicion, numero_camiseta, equipo_id) VALUES ('Ismael Díaz', 'Delantero', 10, 45);
 
 -- Porteros guatemala (ID: 46)
-INSERT INTO jugadores (nombre, posicion, numero_camiseta, equipo_id) VALUES ('Nicholas Hagen', 'Portero', 1, 46);
+INSERT INTO jugadores (nombre, posicion, numero_camiseta, equipo_id) VALUES ('Iker Merida', 'Portero', 41, 46);
 INSERT INTO jugadores (nombre, posicion, numero_camiseta, equipo_id) VALUES ('Kevin Moscoso', 'Portero', 12, 46);
 
 -- Defensas
@@ -1278,6 +1275,8 @@ INSERT INTO jugadores (nombre, posicion, numero_camiseta, equipo_id) VALUES ('Jo
 -- Delanteros
 INSERT INTO jugadores (nombre, posicion, numero_camiseta, equipo_id) VALUES ('Rubio Rubin', 'Delantero', 9, 46);
 INSERT INTO jugadores (nombre, posicion, numero_camiseta, equipo_id) VALUES ('Nathaniel Mendez-Laing', 'Delantero', 11, 46);
+INSERT INTO jugadores (nombre, posicion, numero_camiseta, equipo_id) VALUES ('Saul "Killer" Orozco', 'Delantero', 57, 46);
+
 
 -- Porteros CURAZAO (ID: 47)
 INSERT INTO jugadores (nombre, posicion, numero_camiseta, equipo_id) VALUES ('Eloy Room', 'Portero', 1, 47);
