@@ -1,7 +1,7 @@
 package com.umg.simulador_mundial.controller;
 
 import com.umg.simulador_mundial.model.Estadio;
-import com.umg.simulador_mundial.repository.EstadioRepository;
+import com.umg.simulador_mundial.dao.EstadioDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
@@ -14,11 +14,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class EstadioController {
 
     @Autowired
-    private EstadioRepository estadioRepository;
+    private EstadioDAO estadioDao;
 
     @GetMapping
     public String listarEstadios(Model model) {
-        model.addAttribute("estadios", estadioRepository.findAll());
+        model.addAttribute("estadios", estadioDao.findAll());
         return "lista-estadios";
     }
 
@@ -30,14 +30,14 @@ public class EstadioController {
 
     @PostMapping("/guardar")
     public String guardarEstadio(Estadio estadio) {
-        estadioRepository.save(estadio);
+        estadioDao.save(estadio);
         return "redirect:/estadios";
     }
 
     @GetMapping("/eliminar/{id}")
     public String eliminarEstadio(@PathVariable Long id, RedirectAttributes redirectAttrs) {
         try {
-            estadioRepository.deleteById(id);
+            estadioDao.deleteById(id);
         } catch (DataIntegrityViolationException e) {
             redirectAttrs.addFlashAttribute("error", "No se puede eliminar este estadio porque está en uso.");
         }
@@ -46,10 +46,9 @@ public class EstadioController {
 
     @GetMapping("/editar/{id}")
     public String mostrarFormularioEditar(@PathVariable Long id, Model model) {
-        Estadio estadio = estadioRepository.findById(id).orElse(null);
-        if (estadio == null) {
-            return "redirect:/estadios";
-        }
+        Estadio estadio = estadioDao.findById(id);
+        if (estadio == null) return "redirect:/estadios";
+        
         model.addAttribute("estadio", estadio);
         return "formulario-estadio";
     }

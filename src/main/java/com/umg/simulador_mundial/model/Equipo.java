@@ -1,26 +1,15 @@
 package com.umg.simulador_mundial.model;
 
-import jakarta.persistence.*;
-
-@Entity
-@Table(name = "equipos")
 public class Equipo {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(nullable = false, unique = true)
     private String nombre;
-
-    @Column(nullable = false, length = 3)
     private String abreviatura;
-
     private String entrenador;
+    private String grupo; 
 
-
-    public Equipo() {
-    }
+    // Constructores
+    public Equipo() {}
 
     public Equipo(String nombre, String abreviatura, String entrenador) {
         this.nombre = nombre;
@@ -28,9 +17,7 @@ public class Equipo {
         this.entrenador = entrenador;
     }
 
-    private String grupo; 
-
-
+    // Getters y Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

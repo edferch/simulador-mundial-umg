@@ -1,8 +1,8 @@
 package com.umg.simulador_mundial.controller;
 
 import com.umg.simulador_mundial.model.Equipo;
-import com.umg.simulador_mundial.repository.EquipoRepository;
-import com.umg.simulador_mundial.repository.JugadorRepository;
+import com.umg.simulador_mundial.dao.EquipoDAO;
+import com.umg.simulador_mundial.dao.JugadorDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
@@ -16,26 +16,26 @@ import java.util.List;
 public class EquipoController {
 
     @Autowired
-    private EquipoRepository equipoRepository;
+    private EquipoDAO equipoDao; // <--- Cambiamos a DAO
 
     @Autowired
-    private JugadorRepository jugadorRepository;
+    private JugadorDAO jugadorDao; // <--- Cambiamos a DAO
 
     @GetMapping("/equipos")
     public String verSeleccion(@RequestParam(name = "id", required = false) Long id, Model model) {
-        List<Equipo> todos = equipoRepository.findAll();
+        List<Equipo> todos = equipoDao.findAll();
         
         if (todos.isEmpty()) return "redirect:/";
 
         Equipo equipoActual = (id == null) ? todos.get(0) : 
-            equipoRepository.findById(id).orElse(todos.get(0));
+            (equipoDao.findById(id) != null ? equipoDao.findById(id) : todos.get(0));
 
         int indexActual = todos.indexOf(equipoActual);
         Long idPrev = todos.get(indexActual > 0 ? indexActual - 1 : todos.size() - 1).getId();
         Long idNext = todos.get(indexActual < todos.size() - 1 ? indexActual + 1 : 0).getId();
 
         model.addAttribute("equipo", equipoActual);
-        model.addAttribute("jugadores", jugadorRepository.findByEquipo(equipoActual));
+        model.addAttribute("jugadores", jugadorDao.findByEquipo(equipoActual));
         model.addAttribute("idPrev", idPrev);
         model.addAttribute("idNext", idNext);
         
@@ -50,14 +50,15 @@ public class EquipoController {
 
     @PostMapping("/equipos/guardar")
     public String guardarEquipo(Equipo equipo) {
-        equipoRepository.save(equipo);
-        return "redirect:/equipos?id=" + equipo.getId();
+        equipoDao.save(equipo);
+        // Si es nuevo, regresamos a la lista general
+        return "redirect:/equipos"; 
     }
 
     @GetMapping("/equipos/eliminar/{id}")
     public String eliminarEquipo(@PathVariable Long id, RedirectAttributes redirectAttrs) {
         try {
-            equipoRepository.deleteById(id);
+            equipoDao.deleteById(id);
         } catch (DataIntegrityViolationException e) {
             redirectAttrs.addFlashAttribute("error", "No se puede eliminar la selección porque ya tiene encuentros o jugadores registrados.");
         }
@@ -66,7 +67,7 @@ public class EquipoController {
 
     @GetMapping("/equipos/editar/{id}")
     public String mostrarFormularioEditar(@PathVariable Long id, Model model) {
-        Equipo equipo = equipoRepository.findById(id).orElse(null);
+        Equipo equipo = equipoDao.findById(id);
         model.addAttribute("equipo", equipo);
         return "formulario-equipo";
     }

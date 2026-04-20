@@ -11,28 +11,22 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.umg.simulador_mundial.model.*;
-import com.umg.simulador_mundial.repository.*;
+import com.umg.simulador_mundial.dao.*; // Importamos los nuevos DAO
 
 @Controller
 @RequestMapping("/simulacion")
 public class SimulacionController {
 
-    @Autowired
-    private EquipoRepository equipoRepository;
-
-    @Autowired
-    private EncuentroRepository encuentroRepository;
-
-    @Autowired
-    private JugadorRepository jugadorRepository;
-
-    @Autowired
-    private EventoEncuentroRepository eventoRepository;
+    // Cambiamos todos los Repositories por DAOs
+    @Autowired private EquipoDAO equipoDao;
+    @Autowired private EncuentroDAO encuentroDao;
+    @Autowired private JugadorDAO jugadorDao;
+    @Autowired private EventoEncuentroDAO eventoDao;
 
     @GetMapping
     public String cargarPanel(Model model) {
-        List<Equipo> equipos = equipoRepository.findAll();
-        List<Encuentro> partidos = encuentroRepository.findAll();
+        List<Equipo> equipos = equipoDao.findAll();
+        List<Encuentro> partidos = encuentroDao.findAll();
         
         boolean sorteoRealizado = equipos.stream().anyMatch(e -> e.getGrupo() != null);
         boolean faseGruposTerminada = !partidos.isEmpty() && partidos.stream().allMatch(p -> p.getEstado().equals("FINALIZADO"));
@@ -71,20 +65,20 @@ public class SimulacionController {
 
     @PostMapping("/sortear")
     public String ejecutarSorteo() {
-        encuentroRepository.deleteAll();
-        eventoRepository.deleteAll();
+        encuentroDao.deleteAll();
+        eventoDao.deleteAll();
         
-        List<Equipo> equipos = equipoRepository.findAll();
+        List<Equipo> equipos = equipoDao.findAll();
         Collections.shuffle(equipos);
         String[] letras = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"};
         
         for (int i = 0; i < equipos.size(); i++) {
             Equipo eq = equipos.get(i);
             eq.setGrupo(letras[i / 4]);
-            equipoRepository.save(eq);
+            equipoDao.save(eq);
         }
 
-        Map<String, List<Equipo>> grupos = equipoRepository.findAll().stream()
+        Map<String, List<Equipo>> grupos = equipoDao.findAll().stream()
                 .filter(e -> e.getGrupo() != null)
                 .collect(Collectors.groupingBy(Equipo::getGrupo));
 
@@ -103,7 +97,7 @@ public class SimulacionController {
 
     @PostMapping("/jugar-grupos")
     public String simularFaseGrupos() {
-        List<Encuentro> partidos = encuentroRepository.findAll();
+        List<Encuentro> partidos = encuentroDao.findAll();
         Random rand = new Random();
 
         for (Encuentro p : partidos) {
@@ -113,7 +107,7 @@ public class SimulacionController {
                 p.setGolesLocal(gl);
                 p.setGolesVisitante(gv);
                 p.setEstado("FINALIZADO");
-                encuentroRepository.save(p);
+                encuentroDao.save(p);
 
                 asignarGolesAJugadores(p, p.getEquipoLocal(), gl, gv);
                 asignarGolesAJugadores(p, p.getEquipoVisitante(), gv, gl);
@@ -123,7 +117,7 @@ public class SimulacionController {
     }
 
     private void asignarGolesAJugadores(Encuentro encuentro, Equipo equipo, int golesAnotados, int golesRecibidos) {
-        List<Jugador> plantilla = jugadorRepository.findByEquipo(equipo);
+        List<Jugador> plantilla = jugadorDao.findByEquipo(equipo);
         if (plantilla.isEmpty()) return;
 
         Random rand = new Random();
@@ -133,15 +127,15 @@ public class SimulacionController {
                 i--; continue;
             }
             goleador.setGolesAnotados(goleador.getGolesAnotados() + 1);
-            jugadorRepository.save(goleador);
+            jugadorDao.save(goleador);
 
-            eventoRepository.save(new EventoEncuentro("GOL", rand.nextInt(90) + 1, goleador, encuentro));
+            eventoDao.save(new EventoEncuentro("GOL", rand.nextInt(90) + 1, goleador, encuentro));
         }
 
         for (Jugador j : plantilla) {
             if (j.getPosicion().equalsIgnoreCase("Portero")) {
                 j.setGolesRecibidos(j.getGolesRecibidos() + golesRecibidos);
-                jugadorRepository.save(j);
+                jugadorDao.save(j);
                 break;
             }
         }
@@ -150,8 +144,8 @@ public class SimulacionController {
     @PostMapping("/generar-octavos")
     public String generarOctavos(RedirectAttributes flash) {
         try {
-            List<Equipo> equipos = equipoRepository.findAll();
-            List<Encuentro> partidos = encuentroRepository.findAll();
+            List<Equipo> equipos = equipoDao.findAll();
+            List<Encuentro> partidos = encuentroDao.findAll();
             Map<Long, PosicionGrupo> calculoTemp = new HashMap<>();
             for (Equipo e : equipos) if (e.getGrupo() != null) calculoTemp.put(e.getId(), new PosicionGrupo(e));
 
@@ -185,7 +179,7 @@ public class SimulacionController {
                 oct.setEquipoVisitante(clasificados.get(i+1));
                 oct.setEstado("OCTAVOS_PENDIENTE");
                 oct.setFechaHora(LocalDateTime.now());
-                encuentroRepository.save(oct);
+                encuentroDao.save(oct);
             }
             return "redirect:/simulacion/fase-final";
         } catch (Exception e) {
@@ -196,7 +190,7 @@ public class SimulacionController {
 
     @GetMapping("/fase-final")
     public String verFaseFinal(Model model) {
-        List<Encuentro> todos = encuentroRepository.findAll();
+        List<Encuentro> todos = encuentroDao.findAll();
         model.addAttribute("octavos", todos.stream().filter(p -> p.getEstado().contains("OCTAVOS")).collect(Collectors.toList()));
         model.addAttribute("cuartos", todos.stream().filter(p -> p.getEstado().contains("CUARTOS")).collect(Collectors.toList()));
         model.addAttribute("semis", todos.stream().filter(p -> p.getEstado().contains("SEMI")).collect(Collectors.toList()));
@@ -208,8 +202,8 @@ public class SimulacionController {
         if (terminado) {
             Encuentro fin = todos.stream().filter(p -> p.getEstado().contains("GRAN_FINAL")).findFirst().get();
             model.addAttribute("campeon", fin.getGolesLocal() > fin.getGolesVisitante() ? fin.getEquipoLocal() : fin.getEquipoVisitante());
-            model.addAttribute("goleadores", jugadorRepository.findTop10ByOrderByGolesAnotadosDesc());
-            model.addAttribute("porteros", jugadorRepository.findTop10ByPosicionOrderByGolesRecibidosAsc("Portero"));
+            model.addAttribute("goleadores", jugadorDao.findTop10ByOrderByGolesAnotadosDesc());
+            model.addAttribute("porteros", jugadorDao.findTop10ByPosicionOrderByGolesRecibidosAsc("Portero"));
         }
         return "fase-final-logica";
     }
@@ -217,7 +211,7 @@ public class SimulacionController {
     @PostMapping("/simular-llaves")
     public String simularLlaves(RedirectAttributes flash) {
         try {
-            List<Encuentro> pendientes = encuentroRepository.findAll().stream()
+            List<Encuentro> pendientes = encuentroDao.findAll().stream()
                     .filter(p -> p.getEstado().contains("PENDIENTE") && !p.getEstado().equals("PENDIENTE"))
                     .collect(Collectors.toList());
 
@@ -235,7 +229,7 @@ public class SimulacionController {
                 p.setGolesLocal(gl);
                 p.setGolesVisitante(gv);
                 p.setEstado(faseActual.replace("PENDIENTE", "FINALIZADO"));
-                encuentroRepository.save(p);
+                encuentroDao.save(p);
 
                 asignarGolesAJugadores(p, p.getEquipoLocal(), gl, gv);
                 asignarGolesAJugadores(p, p.getEquipoVisitante(), gv, gl);
@@ -255,7 +249,7 @@ public class SimulacionController {
                     n.setEquipoVisitante(ganadores.get(i + 1));
                     n.setEstado(sig);
                     n.setFechaHora(LocalDateTime.now());
-                    encuentroRepository.save(n);
+                    encuentroDao.save(n);
                 }
             }
             return "redirect:/simulacion/fase-final";
@@ -267,20 +261,23 @@ public class SimulacionController {
 
     @GetMapping("/partido/{id}")
     public String verSimulacionPartido(@PathVariable Long id, Model model) {
-        Encuentro encuentro = encuentroRepository.findById(id).orElseThrow();
+        // En JDBC no usamos Optional, así que solo revisamos si es nulo
+        Encuentro encuentro = encuentroDao.findById(id);
+        if (encuentro == null) return "redirect:/simulacion/fase-final";
+        
         Map<Long, Double> ratings = new HashMap<>();
         List<Jugador> todos = new ArrayList<>();
-        todos.addAll(jugadorRepository.findByEquipo(encuentro.getEquipoLocal()));
-        todos.addAll(jugadorRepository.findByEquipo(encuentro.getEquipoVisitante()));
+        todos.addAll(jugadorDao.findByEquipo(encuentro.getEquipoLocal()));
+        todos.addAll(jugadorDao.findByEquipo(encuentro.getEquipoVisitante()));
 
         Random rand = new Random();
         for(Jugador j : todos) ratings.put(j.getId(), 5.0 + (5.0 * rand.nextDouble()));
 
         model.addAttribute("encuentro", encuentro);
         model.addAttribute("ratings", ratings);
-        model.addAttribute("eventos", eventoRepository.findByEncuentroOrderByMinutoAsc(encuentro));
-        model.addAttribute("plantillaLocal", jugadorRepository.findByEquipo(encuentro.getEquipoLocal()));
-        model.addAttribute("plantillaVisitante", jugadorRepository.findByEquipo(encuentro.getEquipoVisitante()));
+        model.addAttribute("eventos", eventoDao.findByEncuentroOrderByMinutoAsc(encuentro));
+        model.addAttribute("plantillaLocal", jugadorDao.findByEquipo(encuentro.getEquipoLocal()));
+        model.addAttribute("plantillaVisitante", jugadorDao.findByEquipo(encuentro.getEquipoVisitante()));
         return "partido-simulacion";
     }
 
@@ -290,6 +287,6 @@ public class SimulacionController {
         e.setEquipoVisitante(visitante);
         e.setEstado("PENDIENTE");
         e.setFechaHora(LocalDateTime.now());
-        encuentroRepository.save(e);
+        encuentroDao.save(e);
     }
 }

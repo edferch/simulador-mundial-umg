@@ -1,36 +1,14 @@
 package com.umg.simulador_mundial.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-
-@Entity
-@Table(name = "jugadores")
 public class Jugador {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(nullable = false)
     private String nombre;
-
-    private String posicion; // Ejemplo: Portero, Delantero
-
+    private String posicion; 
     private Integer numeroCamiseta;
-
     private Integer golesAnotados = 0;
     private Integer golesRecibidos = 0;
-
-    // Esta es la clave: Relacionamos al jugador con un equipo
-    @ManyToOne
-    @JoinColumn(name = "equipo_id", nullable = false)
-    private Equipo equipo;
+    private Equipo equipo; // Relación simple como objeto
 
     // Constructores
     public Jugador() {}
@@ -42,7 +20,7 @@ public class Jugador {
         this.equipo = equipo;
     }
 
-    // Getters y Setters (Encapsulamiento)
+    // Getters y Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

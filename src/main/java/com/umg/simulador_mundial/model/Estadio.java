@@ -1,21 +1,10 @@
 package com.umg.simulador_mundial.model;
 
-import jakarta.persistence.*;
-
-@Entity
-@Table(name = "estadios")
 public class Estadio {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(nullable = false)
     private String nombre;
-
-    @Column(nullable = false)
     private String ciudad;
-
     private Integer capacidad;
 
     // Constructores

@@ -1,6 +1,6 @@
 package com.umg.simulador_mundial.controller;
 
-import com.umg.simulador_mundial.repository.EncuentroRepository;
+import com.umg.simulador_mundial.dao.EncuentroDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class EncuentroController {
 
     @Autowired
-    private EncuentroRepository encuentroRepository;
+    private EncuentroDAO encuentroDao;
 
     @GetMapping
     public String listarEncuentros(Model model) {
-        model.addAttribute("encuentros", encuentroRepository.findAll());
+        model.addAttribute("encuentros", encuentroDao.findAll());
         return "lista-encuentros";
     }
 }
