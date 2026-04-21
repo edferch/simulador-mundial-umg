@@ -2,56 +2,77 @@ package com.umg.simulador_mundial.dao;
 
 import com.umg.simulador_mundial.model.Encuentro;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import javax.sql.DataSource;
+import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
 public class EncuentroDAO {
 
-    @Autowired private JdbcTemplate jdbcTemplate;
+    @Autowired private DataSource dataSource;
     @Autowired private EquipoDAO equipoDao;
     @Autowired private EstadioDAO estadioDao;
 
-    private RowMapper<Encuentro> encuentroRowMapper = new RowMapper<Encuentro>() {
-        @Override
-        public Encuentro mapRow(ResultSet rs, int rowNum) throws SQLException {
-            Encuentro e = new Encuentro();
-            e.setId(rs.getLong("id"));
-            e.setGolesLocal(rs.getInt("goles_local"));
-            e.setGolesVisitante(rs.getInt("goles_visitante"));
-            
-            Timestamp ts = rs.getTimestamp("fecha_hora");
-            if (ts != null) e.setFechaHora(ts.toLocalDateTime());
-            
-            e.setEstado(rs.getString("estado"));
+    // MÉTODO AUXILIAR para no repetir la lectura de un Encuentro
+    private Encuentro mapearEncuentro(ResultSet rs) throws SQLException {
+        Encuentro e = new Encuentro();
+        e.setId(rs.getLong("id"));
+        e.setGolesLocal(rs.getInt("goles_local"));
+        e.setGolesVisitante(rs.getInt("goles_visitante"));
+        
+        Timestamp ts = rs.getTimestamp("fecha_hora");
+        if (ts != null) e.setFechaHora(ts.toLocalDateTime());
+        
+        e.setEstado(rs.getString("estado"));
 
-            // Obtenemos los objetos complejos usando los otros DAOs
-            e.setEquipoLocal(equipoDao.findById(rs.getLong("local_id")));
-            e.setEquipoVisitante(equipoDao.findById(rs.getLong("visitante_id")));
-            
-            long estadioId = rs.getLong("estadio_id");
-            if (!rs.wasNull()) {
-                e.setEstadio(estadioDao.findById(estadioId));
-            }
-            return e;
+        // Buscamos los objetos relacionados usando los otros DAOs
+        e.setEquipoLocal(equipoDao.findById(rs.getLong("local_id")));
+        e.setEquipoVisitante(equipoDao.findById(rs.getLong("visitante_id")));
+        
+        long estadioId = rs.getLong("estadio_id");
+        if (!rs.wasNull()) {
+            e.setEstadio(estadioDao.findById(estadioId));
         }
-    };
+        return e;
+    }
 
     public List<Encuentro> findAll() {
+        List<Encuentro> lista = new ArrayList<>();
         String sql = "SELECT * FROM encuentros ORDER BY id ASC";
-        return jdbcTemplate.query(sql, encuentroRowMapper);
+
+        try (Connection con = dataSource.getConnection();
+             Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+
+            while (rs.next()) {
+                lista.add(mapearEncuentro(rs));
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al listar encuentros: " + e.getMessage());
+        }
+        return lista;
     }
     
     public Encuentro findById(Long id) {
+        Encuentro encuentro = null;
         String sql = "SELECT * FROM encuentros WHERE id = ?";
-        List<Encuentro> resultados = jdbcTemplate.query(sql, encuentroRowMapper, id);
-        return resultados.isEmpty() ? null : resultados.get(0);
+
+        try (Connection con = dataSource.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+             
+            ps.setLong(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    encuentro = mapearEncuentro(rs);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al buscar encuentro: " + e.getMessage());
+        }
+        return encuentro;
     }
 
     public void save(Encuentro encuentro) {
@@ -59,16 +80,49 @@ public class EncuentroDAO {
         
         if (encuentro.getId() == null) {
             String sql = "INSERT INTO encuentros (local_id, visitante_id, estadio_id, goles_local, goles_visitante, fecha_hora, estado) VALUES (?, ?, ?, ?, ?, ?, ?)";
-            jdbcTemplate.update(sql, encuentro.getEquipoLocal().getId(), encuentro.getEquipoVisitante().getId(), estadioId,
-                    encuentro.getGolesLocal(), encuentro.getGolesVisitante(), encuentro.getFechaHora(), encuentro.getEstado());
+            try (Connection con = dataSource.getConnection();
+                 PreparedStatement ps = con.prepareStatement(sql)) {
+                 
+                ps.setLong(1, encuentro.getEquipoLocal().getId());
+                ps.setLong(2, encuentro.getEquipoVisitante().getId());
+                if (estadioId != null) ps.setLong(3, estadioId); else ps.setNull(3, Types.INTEGER);
+                ps.setInt(4, encuentro.getGolesLocal());
+                ps.setInt(5, encuentro.getGolesVisitante());
+                ps.setTimestamp(6, encuentro.getFechaHora() != null ? Timestamp.valueOf(encuentro.getFechaHora()) : null);
+                ps.setString(7, encuentro.getEstado());
+                
+                ps.executeUpdate();
+            } catch (SQLException e) {
+                System.err.println("Error al insertar encuentro: " + e.getMessage());
+            }
         } else {
             String sql = "UPDATE encuentros SET local_id = ?, visitante_id = ?, estadio_id = ?, goles_local = ?, goles_visitante = ?, fecha_hora = ?, estado = ? WHERE id = ?";
-            jdbcTemplate.update(sql, encuentro.getEquipoLocal().getId(), encuentro.getEquipoVisitante().getId(), estadioId,
-                    encuentro.getGolesLocal(), encuentro.getGolesVisitante(), encuentro.getFechaHora(), encuentro.getEstado(), encuentro.getId());
+            try (Connection con = dataSource.getConnection();
+                 PreparedStatement ps = con.prepareStatement(sql)) {
+                 
+                ps.setLong(1, encuentro.getEquipoLocal().getId());
+                ps.setLong(2, encuentro.getEquipoVisitante().getId());
+                if (estadioId != null) ps.setLong(3, estadioId); else ps.setNull(3, Types.INTEGER);
+                ps.setInt(4, encuentro.getGolesLocal());
+                ps.setInt(5, encuentro.getGolesVisitante());
+                ps.setTimestamp(6, encuentro.getFechaHora() != null ? Timestamp.valueOf(encuentro.getFechaHora()) : null);
+                ps.setString(7, encuentro.getEstado());
+                ps.setLong(8, encuentro.getId());
+                
+                ps.executeUpdate();
+            } catch (SQLException e) {
+                System.err.println("Error al actualizar encuentro: " + e.getMessage());
+            }
         }
     }
 
     public void deleteAll() {
-        jdbcTemplate.update("DELETE FROM encuentros");
+        String sql = "DELETE FROM encuentros";
+        try (Connection con = dataSource.getConnection();
+             Statement st = con.createStatement()) {
+            st.executeUpdate(sql);
+        } catch (SQLException e) {
+            System.err.println("Error al borrar todos los encuentros: " + e.getMessage());
+        }
     }
 }

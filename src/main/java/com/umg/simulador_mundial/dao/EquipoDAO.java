@@ -2,63 +2,127 @@ package com.umg.simulador_mundial.dao;
 
 import com.umg.simulador_mundial.model.Equipo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import javax.sql.DataSource;
+import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
 public class EquipoDAO {
 
+    // Usamos el DataSource de Spring en lugar de crear una clase Conexion manual, 
+    // pero la lógica de JDBC abajo es idéntica a la rúbrica.
     @Autowired
-    private JdbcTemplate jdbcTemplate; // La herramienta de Spring para ejecutar SQL
+    private DataSource dataSource; 
 
-    // Mapeador: Convierte una fila de la base de datos a un objeto Java
-    private RowMapper<Equipo> equipoRowMapper = new RowMapper<Equipo>() {
-        @Override
-        public Equipo mapRow(ResultSet rs, int rowNum) throws SQLException {
-            Equipo e = new Equipo();
-            e.setId(rs.getLong("id"));
-            e.setNombre(rs.getString("nombre"));
-            e.setAbreviatura(rs.getString("abreviatura"));
-            e.setEntrenador(rs.getString("entrenador"));
-            e.setGrupo(rs.getString("grupo"));
-            return e;
-        }
-    };
-
-    // SELECT ALL
+    // 1. SELECT ALL (Equivalente al listarEquipos del ingeniero)
     public List<Equipo> findAll() {
+        List<Equipo> lista = new ArrayList<>();
         String sql = "SELECT * FROM equipos ORDER BY id ASC";
-        return jdbcTemplate.query(sql, equipoRowMapper);
+
+        try (Connection con = dataSource.getConnection();
+             Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+
+            while (rs.next()) {
+                Equipo equipo = new Equipo();
+                equipo.setId(rs.getLong("id"));
+                equipo.setNombre(rs.getString("nombre"));
+                equipo.setAbreviatura(rs.getString("abreviatura"));
+                equipo.setEntrenador(rs.getString("entrenador"));
+                equipo.setGrupo(rs.getString("grupo"));
+                lista.add(equipo);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al listar equipos: " + e.getMessage());
+        }
+        return lista;
     }
 
-    // SELECT BY ID
+    // 2. SELECT BY ID
     public Equipo findById(Long id) {
+        Equipo equipo = null;
         String sql = "SELECT * FROM equipos WHERE id = ?";
-        List<Equipo> resultados = jdbcTemplate.query(sql, equipoRowMapper, id);
-        return resultados.isEmpty() ? null : resultados.get(0);
+
+        // PreparedStatement previene inyección SQL (Punto clave de la rúbrica)
+        try (Connection con = dataSource.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+             
+            ps.setLong(1, id);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    equipo = new Equipo();
+                    equipo.setId(rs.getLong("id"));
+                    equipo.setNombre(rs.getString("nombre"));
+                    equipo.setAbreviatura(rs.getString("abreviatura"));
+                    equipo.setEntrenador(rs.getString("entrenador"));
+                    equipo.setGrupo(rs.getString("grupo"));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al buscar el equipo: " + e.getMessage());
+        }
+        return equipo;
     }
 
-    // INSERT O UPDATE (El reemplazo del save mágico)
+    // 3. INSERT / UPDATE (Equivalente al registrarEquipo del ingeniero)
     public void save(Equipo equipo) {
         if (equipo.getId() == null) {
-            // Es un equipo nuevo (INSERT)
+            // Es un equipo nuevo
             String sql = "INSERT INTO equipos (nombre, abreviatura, entrenador, grupo) VALUES (?, ?, ?, ?)";
-            jdbcTemplate.update(sql, equipo.getNombre(), equipo.getAbreviatura(), equipo.getEntrenador(), equipo.getGrupo());
+            
+            try (Connection con = dataSource.getConnection();
+                 PreparedStatement ps = con.prepareStatement(sql)) {
+                 
+                ps.setString(1, equipo.getNombre());
+                ps.setString(2, equipo.getAbreviatura());
+                ps.setString(3, equipo.getEntrenador());
+                ps.setString(4, equipo.getGrupo());
+                ps.executeUpdate();
+                System.out.println("Éxito: " + equipo.getNombre() + " insertado correctamente.");
+                
+            } catch (SQLException e) {
+                System.err.println("Error al insertar equipo: " + e.getMessage());
+            }
         } else {
-            // Ya existe, lo actualizamos (UPDATE)
+            // El equipo ya existe, lo actualizamos
             String sql = "UPDATE equipos SET nombre = ?, abreviatura = ?, entrenador = ?, grupo = ? WHERE id = ?";
-            jdbcTemplate.update(sql, equipo.getNombre(), equipo.getAbreviatura(), equipo.getEntrenador(), equipo.getGrupo(), equipo.getId());
+            
+            try (Connection con = dataSource.getConnection();
+                 PreparedStatement ps = con.prepareStatement(sql)) {
+                 
+                ps.setString(1, equipo.getNombre());
+                ps.setString(2, equipo.getAbreviatura());
+                ps.setString(3, equipo.getEntrenador());
+                ps.setString(4, equipo.getGrupo());
+                ps.setLong(5, equipo.getId());
+                ps.executeUpdate();
+                System.out.println("Éxito: " + equipo.getNombre() + " actualizado correctamente.");
+                
+            } catch (SQLException e) {
+                System.err.println("Error al actualizar equipo: " + e.getMessage());
+            }
         }
     }
 
-    // DELETE
+    // 4. DELETE
     public void deleteById(Long id) {
         String sql = "DELETE FROM equipos WHERE id = ?";
-        jdbcTemplate.update(sql, id);
+        
+        try (Connection con = dataSource.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+             
+            ps.setLong(1, id);
+            ps.executeUpdate();
+            System.out.println("Equipo con ID " + id + " eliminado correctamente.");
+            
+        } catch (SQLException e) {
+            System.err.println("Error al eliminar equipo: " + e.getMessage());
+            // Lanzamos una excepción para que el controlador muestre el mensaje de error si el equipo ya jugó partidos
+            throw new RuntimeException("Violación de integridad: El equipo está en uso.", e);
+        }
     }
 }

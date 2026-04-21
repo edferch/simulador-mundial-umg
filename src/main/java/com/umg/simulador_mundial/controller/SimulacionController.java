@@ -11,17 +11,18 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.umg.simulador_mundial.model.*;
-import com.umg.simulador_mundial.dao.*; // Importamos los nuevos DAO
+import com.umg.simulador_mundial.dao.*;
 
 @Controller
 @RequestMapping("/simulacion")
 public class SimulacionController {
 
-    // Cambiamos todos los Repositories por DAOs
     @Autowired private EquipoDAO equipoDao;
     @Autowired private EncuentroDAO encuentroDao;
     @Autowired private JugadorDAO jugadorDao;
-    @Autowired private EventoEncuentroDAO eventoDao;
+    
+    // Cambiamos el EventoEncuentroDAO por tu nuevo GolDAO
+    @Autowired private GolDAO golDao; 
 
     @GetMapping
     public String cargarPanel(Model model) {
@@ -66,7 +67,7 @@ public class SimulacionController {
     @PostMapping("/sortear")
     public String ejecutarSorteo() {
         encuentroDao.deleteAll();
-        eventoDao.deleteAll();
+        golDao.deleteAll(); // Borramos los goles si se reinicia el sorteo
         
         List<Equipo> equipos = equipoDao.findAll();
         Collections.shuffle(equipos);
@@ -129,7 +130,8 @@ public class SimulacionController {
             goleador.setGolesAnotados(goleador.getGolesAnotados() + 1);
             jugadorDao.save(goleador);
 
-            eventoDao.save(new EventoEncuentro("GOL", rand.nextInt(90) + 1, goleador, encuentro));
+            // Insertamos un objeto Gol puro (solo lleva minuto, jugador y encuentro)
+            golDao.save(new Gol(rand.nextInt(90) + 1, goleador, encuentro));
         }
 
         for (Jugador j : plantilla) {
@@ -261,7 +263,6 @@ public class SimulacionController {
 
     @GetMapping("/partido/{id}")
     public String verSimulacionPartido(@PathVariable Long id, Model model) {
-        // En JDBC no usamos Optional, así que solo revisamos si es nulo
         Encuentro encuentro = encuentroDao.findById(id);
         if (encuentro == null) return "redirect:/simulacion/fase-final";
         
@@ -275,7 +276,11 @@ public class SimulacionController {
 
         model.addAttribute("encuentro", encuentro);
         model.addAttribute("ratings", ratings);
-        model.addAttribute("eventos", eventoDao.findByEncuentroOrderByMinutoAsc(encuentro));
+        
+        // Seguimos mandando la variable como "eventos" para no romper tu HTML,
+        // pero ahora está llena de objetos "Gol" puros y duros.
+        model.addAttribute("eventos", golDao.findByEncuentroOrderByMinutoAsc(encuentro)); 
+        
         model.addAttribute("plantillaLocal", jugadorDao.findByEquipo(encuentro.getEquipoLocal()));
         model.addAttribute("plantillaVisitante", jugadorDao.findByEquipo(encuentro.getEquipoVisitante()));
         return "partido-simulacion";

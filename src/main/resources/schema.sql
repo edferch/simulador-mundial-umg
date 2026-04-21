@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS encuentro_eventos;
+DROP TABLE IF EXISTS goles;
 DROP TABLE IF EXISTS encuentros;
 DROP TABLE IF EXISTS estadios;
 DROP TABLE IF EXISTS jugadores;
@@ -44,12 +44,12 @@ CREATE TABLE encuentros (
     CONSTRAINT fk_estadio FOREIGN KEY (estadio_id) REFERENCES estadios(id)
 );
 
-CREATE TABLE encuentro_eventos (
+-- Tabla renombrada a 'goles'
+CREATE TABLE goles (
     id SERIAL PRIMARY KEY,
-    tipo VARCHAR(50),
-    minuto INT,
+    minuto INT NOT NULL,
     jugador_id INT NOT NULL,
     encuentro_id INT NOT NULL,
-    CONSTRAINT fk_jugador FOREIGN KEY (jugador_id) REFERENCES jugadores(id),
-    CONSTRAINT fk_encuentro FOREIGN KEY (encuentro_id) REFERENCES encuentros(id) ON DELETE CASCADE
+    CONSTRAINT fk_goles_jugador FOREIGN KEY (jugador_id) REFERENCES jugadores(id),
+    CONSTRAINT fk_goles_encuentro FOREIGN KEY (encuentro_id) REFERENCES encuentros(id) ON DELETE CASCADE
 );
