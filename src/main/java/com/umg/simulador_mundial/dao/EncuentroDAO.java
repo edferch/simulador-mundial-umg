@@ -16,7 +16,6 @@ public class EncuentroDAO {
     @Autowired private EquipoDAO equipoDao;
     @Autowired private EstadioDAO estadioDao;
 
-    // MÉTODO AUXILIAR para no repetir la lectura de un Encuentro
     private Encuentro mapearEncuentro(ResultSet rs) throws SQLException {
         Encuentro e = new Encuentro();
         e.setId(rs.getLong("id"));
@@ -28,7 +27,6 @@ public class EncuentroDAO {
         
         e.setEstado(rs.getString("estado"));
 
-        // Buscamos los objetos relacionados usando los otros DAOs
         e.setEquipoLocal(equipoDao.findById(rs.getLong("local_id")));
         e.setEquipoVisitante(equipoDao.findById(rs.getLong("visitante_id")));
         

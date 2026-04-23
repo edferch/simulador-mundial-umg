@@ -44,7 +44,6 @@ CREATE TABLE encuentros (
     CONSTRAINT fk_estadio FOREIGN KEY (estadio_id) REFERENCES estadios(id)
 );
 
--- Tabla renombrada a 'goles'
 CREATE TABLE goles (
     id SERIAL PRIMARY KEY,
     minuto INT NOT NULL,

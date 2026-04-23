@@ -16,10 +16,10 @@ import java.util.List;
 public class EquipoController {
 
     @Autowired
-    private EquipoDAO equipoDao; // <--- Cambiamos a DAO
+    private EquipoDAO equipoDao;
 
     @Autowired
-    private JugadorDAO jugadorDao; // <--- Cambiamos a DAO
+    private JugadorDAO jugadorDao;
 
     @GetMapping("/equipos")
     public String verSeleccion(@RequestParam(name = "id", required = false) Long id, Model model) {
@@ -51,7 +51,6 @@ public class EquipoController {
     @PostMapping("/equipos/guardar")
     public String guardarEquipo(Equipo equipo) {
         equipoDao.save(equipo);
-        // Si es nuevo, regresamos a la lista general
         return "redirect:/equipos"; 
     }
 

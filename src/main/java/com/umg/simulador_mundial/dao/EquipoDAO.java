@@ -12,12 +12,9 @@ import java.util.List;
 @Repository
 public class EquipoDAO {
 
-    // Usamos el DataSource de Spring en lugar de crear una clase Conexion manual, 
-    // pero la lógica de JDBC abajo es idéntica a la rúbrica.
     @Autowired
     private DataSource dataSource; 
 
-    // 1. SELECT ALL (Equivalente al listarEquipos del ingeniero)
     public List<Equipo> findAll() {
         List<Equipo> lista = new ArrayList<>();
         String sql = "SELECT * FROM equipos ORDER BY id ASC";
@@ -41,12 +38,10 @@ public class EquipoDAO {
         return lista;
     }
 
-    // 2. SELECT BY ID
     public Equipo findById(Long id) {
         Equipo equipo = null;
         String sql = "SELECT * FROM equipos WHERE id = ?";
 
-        // PreparedStatement previene inyección SQL (Punto clave de la rúbrica)
         try (Connection con = dataSource.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
              
@@ -68,10 +63,8 @@ public class EquipoDAO {
         return equipo;
     }
 
-    // 3. INSERT / UPDATE (Equivalente al registrarEquipo del ingeniero)
     public void save(Equipo equipo) {
         if (equipo.getId() == null) {
-            // Es un equipo nuevo
             String sql = "INSERT INTO equipos (nombre, abreviatura, entrenador, grupo) VALUES (?, ?, ?, ?)";
             
             try (Connection con = dataSource.getConnection();
@@ -88,7 +81,6 @@ public class EquipoDAO {
                 System.err.println("Error al insertar equipo: " + e.getMessage());
             }
         } else {
-            // El equipo ya existe, lo actualizamos
             String sql = "UPDATE equipos SET nombre = ?, abreviatura = ?, entrenador = ?, grupo = ? WHERE id = ?";
             
             try (Connection con = dataSource.getConnection();
@@ -108,7 +100,6 @@ public class EquipoDAO {
         }
     }
 
-    // 4. DELETE
     public void deleteById(Long id) {
         String sql = "DELETE FROM equipos WHERE id = ?";
         
@@ -121,7 +112,6 @@ public class EquipoDAO {
             
         } catch (SQLException e) {
             System.err.println("Error al eliminar equipo: " + e.getMessage());
-            // Lanzamos una excepción para que el controlador muestre el mensaje de error si el equipo ya jugó partidos
             throw new RuntimeException("Violación de integridad: El equipo está en uso.", e);
         }
     }

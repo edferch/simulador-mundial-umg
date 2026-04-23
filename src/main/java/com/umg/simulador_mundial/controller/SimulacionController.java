@@ -21,7 +21,6 @@ public class SimulacionController {
     @Autowired private EncuentroDAO encuentroDao;
     @Autowired private JugadorDAO jugadorDao;
     
-    // Cambiamos el EventoEncuentroDAO por tu nuevo GolDAO
     @Autowired private GolDAO golDao; 
 
     @GetMapping
@@ -67,7 +66,7 @@ public class SimulacionController {
     @PostMapping("/sortear")
     public String ejecutarSorteo() {
         encuentroDao.deleteAll();
-        golDao.deleteAll(); // Borramos los goles si se reinicia el sorteo
+        golDao.deleteAll();
         
         List<Equipo> equipos = equipoDao.findAll();
         Collections.shuffle(equipos);
@@ -130,7 +129,6 @@ public class SimulacionController {
             goleador.setGolesAnotados(goleador.getGolesAnotados() + 1);
             jugadorDao.save(goleador);
 
-            // Insertamos un objeto Gol puro (solo lleva minuto, jugador y encuentro)
             golDao.save(new Gol(rand.nextInt(90) + 1, goleador, encuentro));
         }
 
@@ -277,8 +275,6 @@ public class SimulacionController {
         model.addAttribute("encuentro", encuentro);
         model.addAttribute("ratings", ratings);
         
-        // Seguimos mandando la variable como "eventos" para no romper tu HTML,
-        // pero ahora está llena de objetos "Gol" puros y duros.
         model.addAttribute("eventos", golDao.findByEncuentroOrderByMinutoAsc(encuentro)); 
         
         model.addAttribute("plantillaLocal", jugadorDao.findByEquipo(encuentro.getEquipoLocal()));

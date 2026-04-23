@@ -45,7 +45,7 @@ INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Panamá', 'PAN', 
 INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Venezuela', 'VEN', 'Fernando Batista');
 INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Guatemala', 'GUA', 'Eder Fernando Chacón');
 INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Curazao', 'CUW', 'Dick Advocaat');
-INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Nueva Zelanda', 'NZL', 'Darren Bazeley');-- Añadido para completar 48
+INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Nueva Zelanda', 'NZL', 'Darren Bazeley');
 
 -- Canadá 1
 -- Porteros de Canadá (ID: 1)
