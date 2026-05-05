@@ -27,10 +27,20 @@ public class EquipoController {
         
         if (todos.isEmpty()) return "redirect:/";
 
-        Equipo equipoActual = (id == null) ? todos.get(0) : 
-            (equipoDao.findById(id) != null ? equipoDao.findById(id) : todos.get(0));
+        // Buscamos el índice correcto comparando los IDs explícitamente
+        int indexActual = 0; // Por defecto mostramos el primero
+        if (id != null) {
+            for (int i = 0; i < todos.size(); i++) {
+                if (todos.get(i).getId().equals(id)) {
+                    indexActual = i;
+                    break;
+                }
+            }
+        }
 
-        int indexActual = todos.indexOf(equipoActual);
+        Equipo equipoActual = todos.get(indexActual);
+
+        // Calculamos quién es el anterior y el siguiente
         Long idPrev = todos.get(indexActual > 0 ? indexActual - 1 : todos.size() - 1).getId();
         Long idNext = todos.get(indexActual < todos.size() - 1 ? indexActual + 1 : 0).getId();
 
