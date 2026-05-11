@@ -1,93 +1,38 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Plantilla - FIFA UMG</title>
-    <link th:href="@{/css/fifa-style.css}" rel="stylesheet">
+    <title>Buscador de Jugadores</title>
+    <link rel="stylesheet" th:href="@{/css/fifa-style.css}">
 </head>
 <body>
-
-    <div class="main-card" style="background: transparent; border: none; box-shadow: none;">
-        <h1 style="color: white; font-style: italic;">GESTIÓN DE PLANTILLAS</h1>
+    <div class="container">
+        <h1>Buscador de Estrellas</h1>
         
-        <div class="text-right mb-20">
-            <a href="/jugadores/nuevo" class="btn-fifa" style="background: var(--fifa-neon); color: black;">+ Inscribir Jugador</a>
-        </div>
+        <form th:action="@{/jugadores}" method="get" class="search-box">
+            <input type="text" name="buscar" placeholder="Buscar por nombre..." th:value="${param.buscar}">
+            <button type="submit">Buscar</button>
+        </form>
 
-        <div class="pitch-container">
-            
-            <div class="position-row">
-                <div th:each="j : ${jugadores}" th:if="${j.posicion == 'Delantero'}" class="fut-card jugador-row" th:data-id="${j.id}">
-                    <p class="card-rating">85</p>
-                    <p class="card-pos" th:text="${j.posicion}">ST</p>
-                    <div class="card-number" th:text="${j.numeroCamiseta}">10</div>
-                    <p class="card-name" th:text="${j.nombre}">NOMBRE</p>
-                    <p class="card-team" th:text="${j.equipo.nombre}">EQUIPO</p>
-                </div>
-            </div>
-
-            <div class="position-row">
-                <div th:each="j : ${jugadores}" th:if="${j.posicion == 'Mediocampista'}" class="fut-card jugador-row" th:data-id="${j.id}" style="background: linear-gradient(135deg, #50C8FF 0%, #2D23D3 100%); color: white;">
-                    <p class="card-rating">82</p>
-                    <p class="card-pos">MC</p>
-                    <div class="card-number" th:text="${j.numeroCamiseta}">8</div>
-                    <p class="card-name" th:text="${j.nombre}">NOMBRE</p>
-                    <p class="card-team" th:text="${j.equipo.nombre}">EQUIPO</p>
-                </div>
-            </div>
-
-            <div class="position-row">
-                <div th:each="j : ${jugadores}" th:if="${j.posicion == 'Defensa'}" class="fut-card jugador-row" th:data-id="${j.id}" style="background: linear-gradient(135deg, #E8F4EC 0%, #005B3A 100%); color: white;">
-                    <p class="card-rating">79</p>
-                    <p class="card-pos">DF</p>
-                    <div class="card-number" th:text="${j.numeroCamiseta}">4</div>
-                    <p class="card-name" th:text="${j.nombre}">NOMBRE</p>
-                    <p class="card-team" th:text="${j.equipo.nombre}">EQUIPO</p>
-                </div>
-            </div>
-
-            <div class="position-row">
-                <div th:each="j : ${jugadores}" th:if="${j.posicion == 'Portero'}" class="fut-card jugador-row" th:data-id="${j.id}" style="background: linear-gradient(135deg, #ddd 0%, #555 100%); color: white;">
-                    <p class="card-rating">88</p>
-                    <p class="card-pos">GK</p>
-                    <div class="card-number" th:text="${j.numeroCamiseta}">1</div>
-                    <p class="card-name" th:text="${j.nombre}">NOMBRE</p>
-                    <p class="card-team" th:text="${j.equipo.nombre}">EQUIPO</p>
-                </div>
-            </div>
-
-        </div>
-
-        <div class="mt-20">
-            <a href="/" class="btn-fifa">Volver al Inicio</a>
-        </div>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Dorsal</th>
+                    <th>Nombre</th>
+                    <th>Posición</th>
+                    <th>Equipo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="j : ${jugadores}">
+                    <td th:text="${j.numeroCamiseta}">10</td>
+                    <td th:text="${j.nombreCompleto}">Nombre</td>
+                    <td th:text="${j.posicion.descripcion}">Posición</td>
+                    <td>
+                        <a th:href="@{/equipos(id=${j.equipo.id})}" th:text="${j.equipo.nombreEquipo}">Equipo</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
-
-    <div id="contextMenu" class="context-menu">
-        <a id="editOption" href="#">Editar Ficha</a>
-        <a id="deleteOption" href="#" style="color: var(--fifa-red);">Expulsar</a>
-    </div>
-
-    <script>
-        // Mismo script que ya tenías para el contextMenu...
-        document.addEventListener("DOMContentLoaded", function() {
-            const contextMenu = document.getElementById("contextMenu");
-            const editOption = document.getElementById("editOption");
-            const deleteOption = document.getElementById("deleteOption");
-            document.addEventListener("click", () => contextMenu.style.display = "none");
-            const rows = document.querySelectorAll(".jugador-row");
-            rows.forEach(row => {
-                row.addEventListener("contextmenu", function(e) {
-                    e.preventDefault();
-                    const id = this.getAttribute("data-id");
-                    editOption.href = "/jugadores/editar/" + id;
-                    deleteOption.href = "/jugadores/eliminar/" + id;
-                    contextMenu.style.display = "block";
-                    contextMenu.style.left = e.pageX + "px";
-                    contextMenu.style.top = e.pageY + "px";
-                });
-            });
-        });
-    </script>
 </body>
 </html>

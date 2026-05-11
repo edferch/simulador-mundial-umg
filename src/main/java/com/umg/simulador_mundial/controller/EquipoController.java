@@ -1,8 +1,7 @@
 package com.umg.simulador_mundial.controller;
 
-import com.umg.simulador_mundial.model.Equipo;
-import com.umg.simulador_mundial.dao.EquipoDAO;
-import com.umg.simulador_mundial.dao.JugadorDAO;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
@@ -10,25 +9,24 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.List;
+import com.umg.simulador_mundial.dao.EquipoDAO;
+import com.umg.simulador_mundial.dao.JugadorDAO;
+import com.umg.simulador_mundial.dao.PaisDAO;
+import com.umg.simulador_mundial.model.Equipo;
 
 @Controller
 public class EquipoController {
 
-    @Autowired
-    private EquipoDAO equipoDao;
-
-    @Autowired
-    private JugadorDAO jugadorDao;
+    @Autowired private EquipoDAO equipoDao;
+    @Autowired private JugadorDAO jugadorDao;
+    @Autowired private PaisDAO paisDao; // Inyectamos el catálogo de países
 
     @GetMapping("/equipos")
     public String verSeleccion(@RequestParam(name = "id", required = false) Long id, Model model) {
         List<Equipo> todos = equipoDao.findAll();
-        
         if (todos.isEmpty()) return "redirect:/";
 
-        // Buscamos el índice correcto comparando los IDs explícitamente
-        int indexActual = 0; // Por defecto mostramos el primero
+        int indexActual = 0;
         if (id != null) {
             for (int i = 0; i < todos.size(); i++) {
                 if (todos.get(i).getId().equals(id)) {
@@ -37,10 +35,8 @@ public class EquipoController {
                 }
             }
         }
-
         Equipo equipoActual = todos.get(indexActual);
-
-        // Calculamos quién es el anterior y el siguiente
+        
         Long idPrev = todos.get(indexActual > 0 ? indexActual - 1 : todos.size() - 1).getId();
         Long idNext = todos.get(indexActual < todos.size() - 1 ? indexActual + 1 : 0).getId();
 
@@ -48,13 +44,13 @@ public class EquipoController {
         model.addAttribute("jugadores", jugadorDao.findByEquipo(equipoActual));
         model.addAttribute("idPrev", idPrev);
         model.addAttribute("idNext", idNext);
-        
         return "lista-equipos";
     }
 
     @GetMapping("/equipos/nuevo")
     public String mostrarFormulario(Model model) {
         model.addAttribute("equipo", new Equipo());
+        model.addAttribute("paises", paisDao.findAll()); // Mandamos la lista de países
         return "formulario-equipo";
     }
 
@@ -68,8 +64,8 @@ public class EquipoController {
     public String eliminarEquipo(@PathVariable Long id, RedirectAttributes redirectAttrs) {
         try {
             equipoDao.deleteById(id);
-        } catch (DataIntegrityViolationException e) {
-            redirectAttrs.addFlashAttribute("error", "No se puede eliminar la selección porque ya tiene encuentros o jugadores registrados.");
+        } catch (RuntimeException e) {
+            redirectAttrs.addFlashAttribute("error", "No se puede eliminar la selección porque está en uso.");
         }
         return "redirect:/equipos";
     }
@@ -78,6 +74,7 @@ public class EquipoController {
     public String mostrarFormularioEditar(@PathVariable Long id, Model model) {
         Equipo equipo = equipoDao.findById(id);
         model.addAttribute("equipo", equipo);
+        model.addAttribute("paises", paisDao.findAll()); // Mandamos la lista de países
         return "formulario-equipo";
     }
 }

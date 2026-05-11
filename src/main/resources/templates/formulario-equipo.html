@@ -1,22 +1,31 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Registrar Equipo</title>
-    <link th:href="@{/css/fifa-style.css}" rel="stylesheet">
+    <title>Gestión de Selección</title>
+    <link rel="stylesheet" th:href="@{/css/fifa-style.css}">
 </head>
 <body>
-    <div class="main-card">
-        <h1>Registro de Selección</h1>
+    <div class="form-container">
+        <h2 th:text="${equipo.id == null ? 'Nueva Selección' : 'Editar Selección'}">Formulario</h2>
+        
         <form th:action="@{/equipos/guardar}" th:object="${equipo}" method="post">
-            <input type="text" th:field="*{nombre}" placeholder="Nombre del País (ej. Guatemala)" required>
-            <input type="text" th:field="*{abreviatura}" placeholder="Abreviatura (ej. GUA)" maxlength="3">
-            <input type="text" th:field="*{entrenador}" placeholder="Nombre del Entrenador">
-            <button type="submit" class="btn-fifa">Guardar Selección</button>
-            <input type="hidden" th:field="*{id}" />
+            <input type="hidden" th:field="*{id}">
+            
+            <label>Nombre de la Selección:</label>
+            <input type="text" th:field="*{nombreEquipo}" required>
+
+            <label>País (Catálogo):</label>
+            <select th:field="*{pais.id}" required>
+                <option value="">-- Seleccione un país --</option>
+                <option th:each="p : ${paises}" th:value="${p.id}" th:text="${p.nombre}"></option>
+            </select>
+
+            <label>Grupo asignado:</label>
+            <input type="text" th:field="*{grupo}" maxlength="1" placeholder="Ej: A">
+
+            <button type="submit" class="btn-save">Guardar Cambios</button>
+            <a th:href="@{/equipos}" class="btn-cancel">Cancelar</a>
         </form>
-        <div class="mt-20">
-            <a href="/equipos" class="btn-fifa">Cancelar / Volver</a>
-        </div>
     </div>
 </body>
 </html>

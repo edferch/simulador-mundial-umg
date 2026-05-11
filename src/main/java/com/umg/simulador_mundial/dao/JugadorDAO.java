@@ -1,7 +1,6 @@
 package com.umg.simulador_mundial.dao;
 
-import com.umg.simulador_mundial.model.Equipo;
-import com.umg.simulador_mundial.model.Jugador;
+import com.umg.simulador_mundial.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -13,121 +12,84 @@ import java.util.List;
 @Repository
 public class JugadorDAO {
 
-    @Autowired
-    private DataSource dataSource;
+    @Autowired private DataSource dataSource;
+    @Autowired private EquipoDAO equipoDao; // Reutilizamos tu EquipoDAO
 
-    @Autowired
-    private EquipoDAO equipoDao; // Lo usamos para traer el objeto Equipo completo
-
-    // ==============================================================================
-    // MÉTODO AUXILIAR: Para no repetir la extracción de datos en cada consulta
-    // ==============================================================================
     private Jugador mapearJugador(ResultSet rs) throws SQLException {
         Jugador j = new Jugador();
-        j.setId(rs.getLong("id"));
-        j.setNombre(rs.getString("nombre"));
-        j.setPosicion(rs.getString("posicion"));
+        j.setId(rs.getLong("id_jugador"));
+        j.setNombreCompleto(rs.getString("nombre_completo"));
         j.setNumeroCamiseta(rs.getInt("numero_camiseta"));
-        j.setGolesAnotados(rs.getInt("goles_anotados"));
-        j.setGolesRecibidos(rs.getInt("goles_recibidos"));
         
-        // Buscamos el equipo usando su llave foránea
-        long equipoId = rs.getLong("equipo_id");
-        j.setEquipo(equipoDao.findById(equipoId));
+        Posicion pos = new Posicion();
+        pos.setId(rs.getLong("id_posicion"));
+        pos.setDescripcion(rs.getString("desc_posicion"));
+        j.setPosicion(pos);
         
+        j.setEquipo(equipoDao.findById(rs.getLong("id_equipo")));
         return j;
     }
 
-    // 1. SELECT ALL
     public List<Jugador> findAll() {
         List<Jugador> lista = new ArrayList<>();
-        String sql = "SELECT * FROM jugadores ORDER BY equipo_id ASC, numero_camiseta ASC";
+        String sql = "SELECT j.id_jugador, j.nombre_completo, j.numero_camiseta, j.id_equipo, p.id_posicion, p.descripcion AS desc_posicion " +
+                     "FROM jugadores j JOIN posiciones p ON j.id_posicion = p.id_posicion ORDER BY j.id_equipo ASC, j.numero_camiseta ASC";
 
         try (Connection con = dataSource.getConnection();
              Statement st = con.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
-
-            while (rs.next()) {
-                lista.add(mapearJugador(rs));
-            }
+            while (rs.next()) lista.add(mapearJugador(rs));
         } catch (SQLException e) {
-            System.err.println("Error en findAll de Jugadores: " + e.getMessage());
+            System.err.println("Error en findAll Jugadores: " + e.getMessage());
         }
         return lista;
     }
 
-    // 2. SELECT BY ID
     public Jugador findById(Long id) {
-        Jugador jugador = null;
-        String sql = "SELECT * FROM jugadores WHERE id = ?";
-
-        try (Connection con = dataSource.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-             
+        Jugador j = null;
+        String sql = "SELECT j.id_jugador, j.nombre_completo, j.numero_camiseta, j.id_equipo, p.id_posicion, p.descripcion AS desc_posicion " +
+                     "FROM jugadores j JOIN posiciones p ON j.id_posicion = p.id_posicion WHERE j.id_jugador = ?";
+        try (Connection con = dataSource.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setLong(1, id);
             try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    jugador = mapearJugador(rs);
-                }
+                if (rs.next()) j = mapearJugador(rs);
             }
-        } catch (SQLException e) {
-            System.err.println("Error en findById de Jugadores: " + e.getMessage());
-        }
-        return jugador;
+        } catch (SQLException e) { System.err.println("Error en findById: " + e.getMessage()); }
+        return j;
     }
 
-    // 3. SELECT BY EQUIPO
     public List<Jugador> findByEquipo(Equipo equipo) {
         List<Jugador> lista = new ArrayList<>();
-        String sql = "SELECT * FROM jugadores WHERE equipo_id = ? ORDER BY numero_camiseta ASC";
-
-        try (Connection con = dataSource.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-             
+        String sql = "SELECT j.id_jugador, j.nombre_completo, j.numero_camiseta, j.id_equipo, p.id_posicion, p.descripcion AS desc_posicion " +
+                     "FROM jugadores j JOIN posiciones p ON j.id_posicion = p.id_posicion WHERE j.id_equipo = ?";
+        try (Connection con = dataSource.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setLong(1, equipo.getId());
             try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    lista.add(mapearJugador(rs));
-                }
+                while (rs.next()) lista.add(mapearJugador(rs));
             }
-        } catch (SQLException e) {
-            System.err.println("Error al buscar jugadores por equipo: " + e.getMessage());
-        }
+        } catch (SQLException e) { System.err.println("Error en findByEquipo: " + e.getMessage()); }
         return lista;
     }
 
-    // 4. BUSCADOR POR NOMBRE (Para la barra de búsqueda)
-    public List<Jugador> findByNombreContainingIgnoreCase(String nombre) {
-        List<Jugador> lista = new ArrayList<>();
-        String sql = "SELECT * FROM jugadores WHERE nombre ILIKE ? ORDER BY nombre ASC";
-
-        try (Connection con = dataSource.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-             
-            // El % permite buscar coincidencias parciales
-            ps.setString(1, "%" + nombre + "%");
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    lista.add(mapearJugador(rs));
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("Error al buscar jugadores por nombre: " + e.getMessage());
-        }
-        return lista;
-    }
-
-    // 5. TOP 10 GOLEADORES (Bota de Oro)
+    // EL CÁLCULO DEL PICHICHI (REPORTES BIG DATA)
     public List<Jugador> findTop10ByOrderByGolesAnotadosDesc() {
         List<Jugador> lista = new ArrayList<>();
-        String sql = "SELECT * FROM jugadores ORDER BY goles_anotados DESC LIMIT 10";
+        String sql = "SELECT j.id_jugador, j.nombre_completo, j.numero_camiseta, j.id_equipo, " +
+                     "p.id_posicion, p.descripcion AS desc_posicion, COUNT(g.id_jugador) AS total_goles " +
+                     "FROM jugadores j " +
+                     "JOIN posiciones p ON j.id_posicion = p.id_posicion " +
+                     "JOIN goles g ON j.id_jugador = g.id_jugador " +
+                     "GROUP BY j.id_jugador, p.id_posicion, p.descripcion " +
+                     "ORDER BY total_goles DESC LIMIT 10";
 
         try (Connection con = dataSource.getConnection();
              Statement st = con.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
-
             while (rs.next()) {
-                lista.add(mapearJugador(rs));
+                Jugador j = mapearJugador(rs);
+                // Aquí usamos tu campo temporal para que Thymeleaf pueda dibujarlo
+                j.setGolesAnotados(rs.getInt("total_goles")); 
+                lista.add(j);
             }
         } catch (SQLException e) {
             System.err.println("Error al buscar goleadores: " + e.getMessage());
@@ -135,70 +97,32 @@ public class JugadorDAO {
         return lista;
     }
 
-    // 6. TOP 10 MENOS GOLEADOS (Guante de Oro)
-    public List<Jugador> findTop10ByPosicionOrderByGolesRecibidosAsc(String posicion) {
-        List<Jugador> lista = new ArrayList<>();
-        String sql = "SELECT * FROM jugadores WHERE posicion = ? ORDER BY goles_recibidos ASC LIMIT 10";
-
-        try (Connection con = dataSource.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-             
-            ps.setString(1, posicion);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    lista.add(mapearJugador(rs));
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("Error al buscar porteros menos goleados: " + e.getMessage());
-        }
-        return lista;
-    }
-
-    // 7. INSERT Y UPDATE
     public void save(Jugador jugador) {
         if (jugador.getId() == null) {
-            String sql = "INSERT INTO jugadores (nombre, posicion, numero_camiseta, goles_anotados, goles_recibidos, equipo_id) VALUES (?, ?, ?, ?, ?, ?)";
-            
-            try (Connection con = dataSource.getConnection();
-                 PreparedStatement ps = con.prepareStatement(sql)) {
-                 
-                ps.setString(1, jugador.getNombre());
-                ps.setString(2, jugador.getPosicion());
-                ps.setInt(3, jugador.getNumeroCamiseta());
-                ps.setInt(4, jugador.getGolesAnotados());
-                ps.setInt(5, jugador.getGolesRecibidos());
-                ps.setLong(6, jugador.getEquipo().getId());
+            String sql = "INSERT INTO jugadores (nombre_completo, numero_camiseta, id_equipo, id_posicion) VALUES (?, ?, ?, ?)";
+            try (Connection con = dataSource.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+                ps.setString(1, jugador.getNombreCompleto());
+                ps.setInt(2, jugador.getNumeroCamiseta());
+                ps.setLong(3, jugador.getEquipo().getId());
+                ps.setLong(4, jugador.getPosicion().getId());
                 ps.executeUpdate();
-                
-            } catch (SQLException e) {
-                System.err.println("Error al insertar jugador: " + e.getMessage());
-            }
+            } catch (SQLException e) { System.err.println("Error al insertar: " + e.getMessage()); }
         } else {
-            String sql = "UPDATE jugadores SET nombre = ?, posicion = ?, numero_camiseta = ?, goles_anotados = ?, goles_recibidos = ?, equipo_id = ? WHERE id = ?";
-            
-            try (Connection con = dataSource.getConnection();
-                 PreparedStatement ps = con.prepareStatement(sql)) {
-                 
-                ps.setString(1, jugador.getNombre());
-                ps.setString(2, jugador.getPosicion());
-                ps.setInt(3, jugador.getNumeroCamiseta());
-                ps.setInt(4, jugador.getGolesAnotados());
-                ps.setInt(5, jugador.getGolesRecibidos());
-                ps.setLong(6, jugador.getEquipo().getId());
-                ps.setLong(7, jugador.getId());
+            String sql = "UPDATE jugadores SET nombre_completo = ?, numero_camiseta = ?, id_equipo = ?, id_posicion = ? WHERE id_jugador = ?";
+            try (Connection con = dataSource.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+                ps.setString(1, jugador.getNombreCompleto());
+                ps.setInt(2, jugador.getNumeroCamiseta());
+                ps.setLong(3, jugador.getEquipo().getId());
+                ps.setLong(4, jugador.getPosicion().getId());
+                ps.setLong(5, jugador.getId());
                 ps.executeUpdate();
-                
-            } catch (SQLException e) {
-                System.err.println("Error al actualizar jugador: " + e.getMessage());
-            }
+            } catch (SQLException e) { System.err.println("Error al actualizar: " + e.getMessage()); }
         }
     }
 
-    // 8. DELETE
+    // 6. DELETE
     public void deleteById(Long id) {
-        String sql = "DELETE FROM jugadores WHERE id = ?";
-        
+        String sql = "DELETE FROM jugadores WHERE id_jugador = ?";
         try (Connection con = dataSource.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
              
@@ -209,5 +133,30 @@ public class JugadorDAO {
             System.err.println("Error al eliminar jugador: " + e.getMessage());
             throw new RuntimeException("No se puede eliminar el jugador.", e);
         }
+    }
+
+    // BUSCADOR POR NOMBRE (Para la barra de búsqueda web)
+    public List<Jugador> findByNombreContainingIgnoreCase(String nombre) {
+        List<Jugador> lista = new ArrayList<>();
+        // Hacemos el JOIN habitual, pero filtramos con ILIKE por el nombre_completo
+        String sql = "SELECT j.id_jugador, j.nombre_completo, j.numero_camiseta, j.id_equipo, p.id_posicion, p.descripcion AS desc_posicion " +
+                     "FROM jugadores j JOIN posiciones p ON j.id_posicion = p.id_posicion " +
+                     "WHERE j.nombre_completo ILIKE ? ORDER BY j.nombre_completo ASC";
+
+        try (Connection con = dataSource.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+             
+            // Agregamos los % para que encuentre el texto sin importar si está al inicio, medio o final
+            ps.setString(1, "%" + nombre + "%");
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    lista.add(mapearJugador(rs));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al buscar jugadores por nombre: " + e.getMessage());
+        }
+        return lista;
     }
 }

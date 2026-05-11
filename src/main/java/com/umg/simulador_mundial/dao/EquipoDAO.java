@@ -1,6 +1,7 @@
 package com.umg.simulador_mundial.dao;
 
 import com.umg.simulador_mundial.model.Equipo;
+import com.umg.simulador_mundial.model.Pais;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -12,25 +13,35 @@ import java.util.List;
 @Repository
 public class EquipoDAO {
 
-    @Autowired
-    private DataSource dataSource; 
+    @Autowired private DataSource dataSource; 
+
+    // Mapeador auxiliar con JOIN
+    private Equipo mapearEquipo(ResultSet rs) throws SQLException {
+        Equipo eq = new Equipo();
+        eq.setId(rs.getLong("id_equipo"));
+        eq.setNombreEquipo(rs.getString("nombre_equipo"));
+        eq.setGrupo(rs.getString("grupo"));
+
+        Pais p = new Pais();
+        p.setId(rs.getLong("id_pais"));
+        // Asumimos que la consulta JOIN trae el nombre del pais
+        p.setNombre(rs.getString("nombre_pais")); 
+        eq.setPais(p);
+
+        return eq;
+    }
 
     public List<Equipo> findAll() {
         List<Equipo> lista = new ArrayList<>();
-        String sql = "SELECT * FROM equipos ORDER BY id ASC";
+        // Unimos equipos con paises
+        String sql = "SELECT e.id_equipo, e.nombre_equipo, e.grupo, p.id_pais, p.nombre AS nombre_pais " +
+                     "FROM equipos e JOIN paises p ON e.id_pais = p.id_pais ORDER BY e.id_equipo ASC";
 
         try (Connection con = dataSource.getConnection();
              Statement st = con.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
-
             while (rs.next()) {
-                Equipo equipo = new Equipo();
-                equipo.setId(rs.getLong("id"));
-                equipo.setNombre(rs.getString("nombre"));
-                equipo.setAbreviatura(rs.getString("abreviatura"));
-                equipo.setEntrenador(rs.getString("entrenador"));
-                equipo.setGrupo(rs.getString("grupo"));
-                lista.add(equipo);
+                lista.add(mapearEquipo(rs));
             }
         } catch (SQLException e) {
             System.err.println("Error al listar equipos: " + e.getMessage());
@@ -40,22 +51,14 @@ public class EquipoDAO {
 
     public Equipo findById(Long id) {
         Equipo equipo = null;
-        String sql = "SELECT * FROM equipos WHERE id = ?";
+        String sql = "SELECT e.id_equipo, e.nombre_equipo, e.grupo, p.id_pais, p.nombre AS nombre_pais " +
+                     "FROM equipos e JOIN paises p ON e.id_pais = p.id_pais WHERE e.id_equipo = ?";
 
         try (Connection con = dataSource.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
-             
             ps.setLong(1, id);
-            
             try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    equipo = new Equipo();
-                    equipo.setId(rs.getLong("id"));
-                    equipo.setNombre(rs.getString("nombre"));
-                    equipo.setAbreviatura(rs.getString("abreviatura"));
-                    equipo.setEntrenador(rs.getString("entrenador"));
-                    equipo.setGrupo(rs.getString("grupo"));
-                }
+                if (rs.next()) equipo = mapearEquipo(rs);
             }
         } catch (SQLException e) {
             System.err.println("Error al buscar el equipo: " + e.getMessage());
@@ -65,50 +68,39 @@ public class EquipoDAO {
 
     public void save(Equipo equipo) {
         if (equipo.getId() == null) {
-            String sql = "INSERT INTO equipos (nombre, abreviatura, entrenador, grupo) VALUES (?, ?, ?, ?)";
-            
+            String sql = "INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES (?, ?, ?)";
             try (Connection con = dataSource.getConnection();
                  PreparedStatement ps = con.prepareStatement(sql)) {
-                 
-                ps.setString(1, equipo.getNombre());
-                ps.setString(2, equipo.getAbreviatura());
-                ps.setString(3, equipo.getEntrenador());
-                ps.setString(4, equipo.getGrupo());
+                ps.setString(1, equipo.getNombreEquipo());
+                ps.setLong(2, equipo.getPais().getId());
+                ps.setString(3, equipo.getGrupo());
                 ps.executeUpdate();
-                System.out.println("Éxito: " + equipo.getNombre() + " insertado correctamente.");
-                
             } catch (SQLException e) {
                 System.err.println("Error al insertar equipo: " + e.getMessage());
             }
         } else {
-            String sql = "UPDATE equipos SET nombre = ?, abreviatura = ?, entrenador = ?, grupo = ? WHERE id = ?";
-            
+            String sql = "UPDATE equipos SET nombre_equipo = ?, id_pais = ?, grupo = ? WHERE id_equipo = ?";
             try (Connection con = dataSource.getConnection();
                  PreparedStatement ps = con.prepareStatement(sql)) {
-                 
-                ps.setString(1, equipo.getNombre());
-                ps.setString(2, equipo.getAbreviatura());
-                ps.setString(3, equipo.getEntrenador());
-                ps.setString(4, equipo.getGrupo());
-                ps.setLong(5, equipo.getId());
+                ps.setString(1, equipo.getNombreEquipo());
+                ps.setLong(2, equipo.getPais().getId());
+                ps.setString(3, equipo.getGrupo());
+                ps.setLong(4, equipo.getId());
                 ps.executeUpdate();
-                System.out.println("Éxito: " + equipo.getNombre() + " actualizado correctamente.");
-                
             } catch (SQLException e) {
                 System.err.println("Error al actualizar equipo: " + e.getMessage());
             }
         }
     }
 
+    // 5. DELETE
     public void deleteById(Long id) {
-        String sql = "DELETE FROM equipos WHERE id = ?";
-        
+        String sql = "DELETE FROM equipos WHERE id_equipo = ?";
         try (Connection con = dataSource.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
              
             ps.setLong(1, id);
             ps.executeUpdate();
-            System.out.println("Equipo con ID " + id + " eliminado correctamente.");
             
         } catch (SQLException e) {
             System.err.println("Error al eliminar equipo: " + e.getMessage());

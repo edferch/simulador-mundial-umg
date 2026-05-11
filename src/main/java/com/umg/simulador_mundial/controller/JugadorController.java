@@ -1,31 +1,28 @@
 package com.umg.simulador_mundial.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.umg.simulador_mundial.model.Jugador;
 import com.umg.simulador_mundial.dao.EquipoDAO;
 import com.umg.simulador_mundial.dao.JugadorDAO;
+import com.umg.simulador_mundial.dao.PosicionDAO;
+import com.umg.simulador_mundial.model.Jugador;
 
 @Controller
 @RequestMapping("/jugadores")
 public class JugadorController {
 
-    @Autowired
-    private JugadorDAO jugadorDao;
-
-    @Autowired
-    private EquipoDAO equipoDao;
+    @Autowired private JugadorDAO jugadorDao;
+    @Autowired private EquipoDAO equipoDao;
+    @Autowired private PosicionDAO posicionDao; // Inyectamos el catálogo de posiciones
 
     @GetMapping
     public String listarJugadores(@RequestParam(name = "buscar", required = false) String buscar, Model model) {
         if (buscar != null && !buscar.isEmpty()) {
             model.addAttribute("jugadores", jugadorDao.findByNombreContainingIgnoreCase(buscar));
-            model.addAttribute("terminoBusqueda", buscar); 
         } else {
             model.addAttribute("jugadores", jugadorDao.findAll());
         }
@@ -36,6 +33,7 @@ public class JugadorController {
     public String mostrarFormulario(Model model) {
         model.addAttribute("jugador", new Jugador());
         model.addAttribute("equipos", equipoDao.findAll());
+        model.addAttribute("posiciones", posicionDao.findAll()); // Mandamos la lista de posiciones
         return "formulario-jugador";
     }
 
@@ -51,7 +49,7 @@ public class JugadorController {
         Long equipoId = (j != null) ? j.getEquipo().getId() : null;
         try {
             jugadorDao.deleteById(id);
-        } catch (DataIntegrityViolationException e) {
+        } catch (RuntimeException e) {
             redirectAttrs.addFlashAttribute("error", "No se puede eliminar este jugador en este momento.");
         }
         return equipoId != null ? "redirect:/equipos?id=" + equipoId : "redirect:/jugadores";
@@ -62,6 +60,7 @@ public class JugadorController {
         Jugador jugador = jugadorDao.findById(id);
         model.addAttribute("jugador", jugador);
         model.addAttribute("equipos", equipoDao.findAll());
+        model.addAttribute("posiciones", posicionDao.findAll()); // Mandamos la lista de posiciones
         return "formulario-jugador";
     }
 }

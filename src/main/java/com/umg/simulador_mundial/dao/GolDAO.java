@@ -1,7 +1,7 @@
 package com.umg.simulador_mundial.dao;
 
-import com.umg.simulador_mundial.model.Encuentro;
 import com.umg.simulador_mundial.model.Gol;
+import com.umg.simulador_mundial.model.Partido;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -15,67 +15,49 @@ public class GolDAO {
 
     @Autowired private DataSource dataSource;
     @Autowired private JugadorDAO jugadorDao;
-    @Autowired private EncuentroDAO encuentroDao;
 
-    // MÉTODO AUXILIAR
-    private Gol mapearGol(ResultSet rs) throws SQLException {
-        Gol g = new Gol();
-        g.setId(rs.getLong("id"));
-        g.setMinuto(rs.getInt("minuto"));
+    public void save(Gol gol) {
+        // Con llaves compuestas, hacemos INSERT directamente
+        String sql = "INSERT INTO goles (id_partido, id_jugador, minuto, tipo_gol) VALUES (?, ?, ?, ?)";
         
-        // Extraer los objetos completos usando las llaves foráneas
-        g.setJugador(jugadorDao.findById(rs.getLong("jugador_id")));
-        g.setEncuentro(encuentroDao.findById(rs.getLong("encuentro_id")));
-        return g;
+        try (Connection con = dataSource.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+             
+            ps.setLong(1, gol.getPartido().getId());
+            ps.setLong(2, gol.getJugador().getId());
+            ps.setInt(3, gol.getMinuto());
+            ps.setString(4, gol.getTipoGol());
+            ps.executeUpdate();
+            
+        } catch (SQLException e) { System.err.println("Error al registrar el gol: " + e.getMessage()); }
     }
 
-    // Buscar los goles de un partido específico ordenados por minuto
-    public List<Gol> findByEncuentroOrderByMinutoAsc(Encuentro encuentro) {
+    public List<Gol> findByPartido(Partido partido) {
         List<Gol> lista = new ArrayList<>();
-        String sql = "SELECT * FROM goles WHERE encuentro_id = ? ORDER BY minuto ASC";
+        String sql = "SELECT * FROM goles WHERE id_partido = ? ORDER BY minuto ASC";
 
         try (Connection con = dataSource.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
              
-            ps.setLong(1, encuentro.getId());
+            ps.setLong(1, partido.getId());
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    lista.add(mapearGol(rs));
+                    Gol g = new Gol();
+                    g.setPartido(partido);
+                    g.setJugador(jugadorDao.findById(rs.getLong("id_jugador")));
+                    g.setMinuto(rs.getInt("minuto"));
+                    g.setTipoGol(rs.getString("tipo_gol"));
+                    lista.add(g);
                 }
             }
-        } catch (SQLException e) {
-            System.err.println("Error al buscar los goles del partido: " + e.getMessage());
-        }
+        } catch (SQLException e) { System.err.println("Error al buscar goles del partido: " + e.getMessage()); }
         return lista;
     }
 
-    // Insertar un nuevo gol
-    public void save(Gol gol) {
-        if (gol.getId() == null) {
-            String sql = "INSERT INTO goles (minuto, jugador_id, encuentro_id) VALUES (?, ?, ?)";
-            
-            try (Connection con = dataSource.getConnection();
-                 PreparedStatement ps = con.prepareStatement(sql)) {
-                 
-                ps.setInt(1, gol.getMinuto());
-                ps.setLong(2, gol.getJugador().getId());
-                ps.setLong(3, gol.getEncuentro().getId());
-                ps.executeUpdate();
-                
-            } catch (SQLException e) {
-                System.err.println("Error al registrar el gol: " + e.getMessage());
-            }
-        }
-    }
-
-    // Limpiar tabla (usado al reiniciar sorteos)
     public void deleteAll() {
-        String sql = "DELETE FROM goles";
         try (Connection con = dataSource.getConnection();
              Statement st = con.createStatement()) {
-            st.executeUpdate(sql);
-        } catch (SQLException e) {
-            System.err.println("Error al borrar los goles: " + e.getMessage());
-        }
+            st.executeUpdate("DELETE FROM goles");
+        } catch (SQLException e) { System.err.println("Error al borrar los goles: " + e.getMessage()); }
     }
 }
