@@ -16,6 +16,12 @@
             </div>
         </div>
 
+        <div style="text-align: center; margin-bottom: 30px;">
+            <form th:action="@{/simulacion/asignar-estadios}" method="post">
+                <button type="submit" class="btn-fifa" style="background: var(--fifa-green); color: white;">🔄 ASIGNAR ESTADIOS ALEATORIAMENTE</button>
+            </form>
+        </div>
+
         <div class="calendar-view">
             <div th:each="partido : ${encuentros}" class="calendar-row">
                 

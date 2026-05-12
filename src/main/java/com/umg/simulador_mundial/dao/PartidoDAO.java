@@ -143,10 +143,30 @@ public class PartidoDAO {
                  PreparedStatement ps = con.prepareStatement(sql)) {
                  
                 ps.setTimestamp(1, partido.getFechaHora() != null ? Timestamp.valueOf(partido.getFechaHora()) : null);
-                ps.setLong(2, partido.getEstadio().getId());
-                ps.setLong(3, partido.getFase().getId());
-                ps.setLong(4, partido.getEquipoLocal().getId());
-                ps.setLong(5, partido.getEquipoVisitante().getId());
+                
+                if (partido.getEstadio() != null && partido.getEstadio().getId() != null) {
+                    ps.setLong(2, partido.getEstadio().getId());
+                } else {
+                    ps.setNull(2, Types.BIGINT);
+                }
+                
+                if (partido.getFase() != null && partido.getFase().getId() != null) {
+                    ps.setLong(3, partido.getFase().getId());
+                } else {
+                    ps.setNull(3, Types.BIGINT);
+                }
+                
+                if (partido.getEquipoLocal() != null && partido.getEquipoLocal().getId() != null) {
+                    ps.setLong(4, partido.getEquipoLocal().getId());
+                } else {
+                    ps.setNull(4, Types.BIGINT);
+                }
+                
+                if (partido.getEquipoVisitante() != null && partido.getEquipoVisitante().getId() != null) {
+                    ps.setLong(5, partido.getEquipoVisitante().getId());
+                } else {
+                    ps.setNull(5, Types.BIGINT);
+                }
                 
                 if (partido.getGolesLocal() != null) {
                     ps.setInt(6, partido.getGolesLocal());

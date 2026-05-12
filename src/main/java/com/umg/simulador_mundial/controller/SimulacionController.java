@@ -488,4 +488,28 @@ public class SimulacionController {
 
         return "partido-simulacion";
     }
+
+    // RUTA EXTRA PARA ASIGNAR ESTADIOS A PARTIDOS YA CREADOS
+    @PostMapping("/asignar-estadios")
+    @Transactional
+    public String forzarAsignacionEstadios() {
+        List<Partido> partidos = partidoDao.findAll();
+        // Filtramos para no asignar el 'Estadio Nacional' de emergencia si ya tienes estadios reales
+        List<Estadio> estadiosReales = estadioDao.findAll().stream()
+                .filter(e -> e.getNombre() != null && !e.getNombre().toLowerCase().contains("nacional"))
+                .collect(Collectors.toList());
+
+        if (estadiosReales.isEmpty()) {
+            estadiosReales = estadioDao.findAll(); // Respaldo seguro por si acaso
+        }
+
+        if (!estadiosReales.isEmpty()) {
+            Random rand = new Random();
+            for (Partido p : partidos) {
+                p.setEstadio(estadiosReales.get(rand.nextInt(estadiosReales.size())));
+                partidoDao.save(p);
+            }
+        }
+        return "redirect:/encuentros";
+    }
 }
