@@ -1,44 +1,149 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Selecciones Mundialistas</title>
-    <link rel="stylesheet" th:href="@{/css/fifa-style.css}">
+    <meta charset="UTF-8">
+    <title>Selecciones - FIFA UMG</title>
+    <link th:href="@{/css/fifa-style.css}" rel="stylesheet">
+    <style>
+        .selector-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 50px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(209, 245, 10, 0.1);
+            border-radius: 10px;
+        }
+        .nav-arrow {
+            font-size: 4rem;
+            color: var(--fifa-neon);
+            text-decoration: none;
+            transition: transform 0.2s;
+        }
+        .nav-arrow:hover { transform: scale(1.2); }
+        
+        .team-info-panel { text-align: center; min-width: 400px; cursor: context-menu; }
+        .flag-box { width: 100px; height: 60px; background: var(--fifa-white); margin: 0 auto 15px; border: 3px solid white; box-shadow: 0 0 15px var(--fifa-neon); }
+    </style>
 </head>
-<body>
-    <div class="container">
-        <header>
-            <h1 th:text="${equipo.nombreEquipo}">Nombre del Equipo</h1>
-            <div class="nav-buttons">
-                <a th:href="@{/equipos(id=${idPrev})}" class="btn-nav">← Anterior</a>
-                <a th:href="@{/}" class="btn-nav">Inicio</a>
-                <a th:href="@{/equipos(id=${idNext})}" class="btn-nav">Siguiente →</a>
-            </div>
-        </header>
+<body style="background: var(--fifa-dark-bg);">
 
-        <main class="selection-detail">
-            <div class="team-info">
-                <p><strong>País:</strong> <span th:text="${equipo.pais.nombre}">Nombre País</span></p>
-                <p><strong>Grupo:</strong> <span th:text="${equipo.grupo}">A</span></p>
-                <div class="actions">
-                    <a th:href="@{/equipos/editar/{id}(id=${equipo.id})}" class="btn-edit">Editar Selección</a>
+    <div class="main-card" style="background: transparent; border: none;">
+        
+        <div class="selector-header">
+            <a th:href="@{/equipos(id=${idPrev})}" class="nav-arrow">◀</a>
+            
+            <div class="team-info-panel" th:data-id="${equipo.id}" data-type="equipos">
+                <div class="flag-box">
+                    <div style="width:100%; height:100%; background: var(--fifa-green); display:flex; align-items:center; justify-content:center; color:white; font-weight:bold; font-size:1.5rem;" th:text="'G. ' + ${equipo.grupo}"></div>
+                </div>
+                <h1 style="font-size: 4rem; margin: 0; letter-spacing: 5px;" th:text="${equipo.nombreEquipo}">GUATEMALA</h1>
+                <p style="color: var(--fifa-neon); font-weight: bold; letter-spacing: 2px;" th:text="'PAÍS: ' + ${equipo.pais.nombre}">PAÍS</p>
+            </div>
+
+            <a th:href="@{/equipos(id=${idNext})}" class="nav-arrow">▶</a>
+        </div>
+
+        <div class="pitch-container">
+            <div class="position-row">
+                <div th:each="j : ${jugadores}" th:if="${j.posicion.descripcion == 'Delantero'}" 
+                     class="fut-card" th:data-id="${j.id}" data-type="jugadores">
+                    <p class="card-rating">85</p>
+                    <p class="card-pos">ST</p>
+                    <div class="card-number" th:text="${j.numeroCamiseta}">10</div>
+                    <p class="card-name" th:text="${j.nombreCompleto}">NOMBRE</p>
                 </div>
             </div>
 
-            <section class="players-grid">
-                <div th:each="j : ${jugadores}" class="player-card">
-                    <div class="card-header">
-                        <span class="number" th:text="${j.numeroCamiseta}">10</span>
-                        <span class="pos" th:text="${j.posicion.descripcion}">DEL</span>
-                    </div>
-                    <h3 th:text="${j.nombreCompleto}">Nombre Jugador</h3>
-                    <div class="card-footer">
-                        <a th:href="@{/jugadores/editar/{id}(id=${j.id})}">⚙️</a>
-                        <a th:href="@{/jugadores/eliminar/{id}(id=${j.id})}" style="color:red">X</a>
-                    </div>
+            <div class="position-row">
+                <div th:each="j : ${jugadores}" th:if="${j.posicion.descripcion == 'Mediocampista'}" 
+                     class="fut-card" th:data-id="${j.id}" data-type="jugadores"
+                     style="background: linear-gradient(135deg, #50C8FF 0%, #2D23D3 100%); color: white;">
+                    <p class="card-rating">82</p>
+                    <p class="card-pos">MC</p>
+                    <div class="card-number" th:text="${j.numeroCamiseta}">8</div>
+                    <p class="card-name" th:text="${j.nombreCompleto}">NOMBRE</p>
                 </div>
-                <a th:href="@{/jugadores/nuevo}" class="add-player-card">+ Añadir Jugador</a>
-            </section>
-        </main>
+            </div>
+
+            <div class="position-row">
+                <div th:each="j : ${jugadores}" th:if="${j.posicion.descripcion == 'Defensa'}" 
+                     class="fut-card" th:data-id="${j.id}" data-type="jugadores"
+                     style="background: linear-gradient(135deg, #E8F4EC 0%, #005B3A 100%); color: white;">
+                    <p class="card-rating">79</p>
+                    <p class="card-pos">DF</p>
+                    <div class="card-number" th:text="${j.numeroCamiseta}">4</div>
+                    <p class="card-name" th:text="${j.nombreCompleto}">NOMBRE</p>
+                </div>
+            </div>
+
+            <div class="position-row">
+                <div th:each="j : ${jugadores}" th:if="${j.posicion.descripcion == 'Portero'}" 
+                     class="fut-card" th:data-id="${j.id}" data-type="jugadores"
+                     style="background: linear-gradient(135deg, #ddd 0%, #555 100%); color: white;">
+                    <p class="card-rating">88</p>
+                    <p class="card-pos">GK</p>
+                    <div class="card-number" th:text="${j.numeroCamiseta}">1</div>
+                    <p class="card-name" th:text="${j.nombreCompleto}">NOMBRE</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-20" style="text-align: center;">
+            <a href="/simulacion" class="btn-fifa">Volver al Dashboard</a>
+            <a th:href="@{/jugadores/nuevo}" class="btn-fifa" style="background: var(--fifa-neon); color: black;">+ Inscribir Jugador</a>
+        </div>
     </div>
+
+    <div id="context-menu" class="context-menu">
+        <div class="context-menu-item" id="menu-edit">EDITAR</div>
+        <div class="context-menu-item delete" id="menu-delete">ELIMINAR</div>
+    </div>
+
+    <script>
+        const contextMenu = document.getElementById('context-menu');
+        let selectedId = null;
+        let selectedType = null;
+
+        document.addEventListener('contextmenu', function(e) {
+            const target = e.target.closest('[data-id]');
+            
+            if (target) {
+                e.preventDefault(); 
+                selectedId = target.getAttribute('data-id');
+                selectedType = target.getAttribute('data-type');
+
+                contextMenu.style.top = `${e.pageY}px`;
+                contextMenu.style.left = `${e.pageX}px`;
+                contextMenu.style.display = 'block';
+            } else {
+                contextMenu.style.display = 'none';
+            }
+        });
+
+        document.addEventListener('click', function() {
+            contextMenu.style.display = 'none';
+        });
+
+        document.getElementById('menu-edit').onclick = function() {
+            if (selectedId && selectedType) {
+                window.location.href = `/${selectedType}/editar/${selectedId}`;
+            }
+        };
+
+        document.getElementById('menu-delete').onclick = function() {
+            if (selectedId && selectedType) {
+                const confirmMsg = selectedType === 'equipos' 
+                    ? '¿Estás seguro de eliminar esta selección? Se perderán todos sus jugadores.' 
+                    : '¿Deseas eliminar a este jugador de la plantilla?';
+                
+                if (confirm(confirmMsg)) {
+                    window.location.href = `/${selectedType}/eliminar/${selectedId}`;
+                }
+            }
+        };
+    </script>
+
 </body>
 </html>
