@@ -1,3 +1,5 @@
+//base de datos antigua para equipos
+
 INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Canadá', 'CAN', 'Jesse Marsch');
 INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('Estados Unidos', 'USA', 'Mauricio Pochettino');
 INSERT INTO equipos (nombre, abreviatura, entrenador) VALUES ('México', 'MEX', 'Javier Aguirre');
