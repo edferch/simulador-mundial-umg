@@ -20,6 +20,7 @@ public class CalendarioController {
     public String verCalendario(Model model) {
         List<Partido> partidos = partidoDao.findAll();
         model.addAttribute("partidos", partidos);
+        model.addAttribute("encuentros", partidos); // Alias para que el HTML lo encuentre
         return "lista-encuentros";
     }
 }
