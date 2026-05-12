@@ -2,112 +2,71 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Panel de Simulación - FIFA UMG</title>
-    <link rel="stylesheet" th:href="@{/css/fifa-style.css}">
+    <title>Dashboard - FIFA UMG</title>
+    <link th:href="@{/css/fifa-style.css}" rel="stylesheet">
     <style>
-        .sim-header {
-            text-align: center;
-            padding: 30px;
-            background: rgba(0, 0, 0, 0.7);
-            border-bottom: 3px solid var(--fifa-neon);
-            margin-bottom: 30px;
-            color: white;
-        }
-        .action-btn {
-            padding: 15px 40px;
-            font-size: 1.5rem;
-            font-weight: bold;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            text-transform: uppercase;
-            transition: transform 0.2s, box-shadow 0.2s;
-            margin: 10px;
-        }
-        .btn-sorteo { background: gold; color: black; box-shadow: 0 0 15px gold; }
-        .btn-sorteo:hover { transform: scale(1.05); }
-        .btn-simular { background: var(--fifa-neon); color: black; }
-        .btn-simular:hover { transform: scale(1.05); }
-        .btn-finales { background: #2D23D3; color: white; }
-
-        .groups-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            padding: 20px;
-        }
-        .group-card {
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 10px;
-            padding: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-        .group-card h3 {
-            margin-top: 0;
-            background: var(--fifa-dark-bg);
-            color: white;
-            padding: 10px;
-            text-align: center;
-            border-radius: 5px;
-        }
-        .table-pos { width: 100%; border-collapse: collapse; }
-        .table-pos th, .table-pos td { padding: 8px; text-align: center; border-bottom: 1px solid #ccc; }
-        .table-pos th { background: #eee; font-size: 0.9rem; }
-        .table-pos .team-name { text-align: left; font-weight: bold; }
-        .pts { font-weight: bold; color: #2D23D3; font-size: 1.1rem; }
+        .neon-title { color: var(--fifa-neon); text-shadow: 0 0 10px var(--fifa-neon); font-size: 3.5rem; margin: 0; }
+        .groups-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; padding: 40px; }
+        .group-card { background: rgba(18, 18, 18, 0.85); border: 2px solid rgba(209, 245, 10, 0.3); border-radius: 15px; padding: 20px; transition: 0.3s; }
+        .group-card:hover { border-color: var(--fifa-neon); box-shadow: 0 0 20px rgba(209, 245, 10, 0.2); }
+        .group-card h2 { background: var(--fifa-neon); color: black; padding: 5px 15px; border-radius: 5px; display: inline-block; margin-bottom: 15px; }
+        
+        .fifa-table { width: 100%; border-collapse: collapse; color: white; }
+        .fifa-table th { color: var(--fifa-neon); border-bottom: 1px solid #444; padding: 10px; font-size: 0.8rem; }
+        .fifa-table td { padding: 12px 10px; border-bottom: 1px solid #222; text-align: center; }
+        .team-name { text-align: left !important; font-weight: bold; letter-spacing: 1px; }
+        .pts-col { color: var(--fifa-neon); font-weight: 900; font-size: 1.2rem; }
     </style>
 </head>
-<body class="stadium-bg">
-    
-    <header class="sim-header">
-        <h1 style="font-size: 3rem; letter-spacing: 2px;">Copa Mundial UMG 2026</h1>
-        <p style="font-size: 1.2rem; margin-bottom: 20px;">Módulo de Simulación Avanzada y Big Data</p>
+<body style="background: var(--fifa-dark-bg);">
+
+    <div style="text-align: center; padding-top: 50px;">
+        <h1 class="neon-title">Copa Mundial UMG 2026</h1>
+        <p style="color: white; letter-spacing: 5px; opacity: 0.7;">SIMULADOR DE ALTO RENDIMIENTO</p>
         
-        <div class="main-actions">
+        <div style="margin-top: 30px;">
             <form th:if="${!sorteoRealizado}" th:action="@{/simulacion/sortear}" method="post">
-                <button type="submit" class="action-btn btn-sorteo">🏆 Realizar Sorteo Oficial 🏆</button>
+                <button type="submit" class="btn-fifa" style="background: gold; color: black; font-size: 1.5rem; padding: 15px 50px;">
+                    REALIZAR SORTEO OFICIAL
+                </button>
             </form>
 
             <form th:if="${sorteoRealizado and !faseGruposTerminada}" th:action="@{/simulacion/jugar-grupos}" method="post">
-                <button type="submit" class="action-btn btn-simular">⚽ Simular Fase de Grupos ⚽</button>
+                <button type="submit" class="btn-fifa" style="background: var(--fifa-neon); color: black; font-size: 1.5rem; padding: 15px 50px;">
+                    SIMULAR FASE DE GRUPOS ⚽
+                </button>
             </form>
 
-            <a th:if="${faseGruposTerminada}" th:href="@{/simulacion/fase-final}" class="action-btn btn-finales">Ver Llaves Eliminatorias ➔</a>
+            <a th:if="${faseGruposTerminada}" th:href="@{/simulacion/fase-final}" class="btn-fifa" style="background: #2D23D3; color: white;">
+                VER BRACKET FINAL ➔
+            </a>
         </div>
-        
-        <div style="margin-top: 15px;">
-            <a th:href="@{/}" style="color: white; text-decoration: underline;">Volver al Menú Principal</a>
-        </div>
-    </header>
+        <a href="/" style="color: gray; display: block; margin-top: 20px; text-decoration: none;">← Volver al Inicio</a>
+    </div>
 
-    <div class="container">
-        <div class="groups-grid" th:if="${sorteoRealizado}">
-            <div th:each="entry : ${tablasPosiciones}" class="group-card">
-                <h3 th:text="'GRUPO ' + ${entry.key}">Grupo A</h3>
-                <table class="table-pos">
-                    <thead>
-                        <tr>
-                            <th>Equipo</th>
-                            <th>PTS</th>
-                            <th>PJ</th>
-                            <th>GF</th>
-                            <th>GC</th>
-                            <th>DIF</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="pos : ${entry.value}">
-                            <td class="team-name" th:text="${pos.equipo.nombreEquipo}">Equipo</td>
-                            <td class="pts" th:text="${pos.puntos}">0</td>
-                            <td th:text="${pos.partidosJugados}">0</td>
-                            <td th:text="${pos.golesFavor}">0</td>
-                            <td th:text="${pos.golesContra}">0</td>
-                            <td th:text="${pos.golesFavor - pos.golesContra}" 
-                                th:style="${(pos.golesFavor - pos.golesContra) > 0 ? 'color: green;' : ((pos.golesFavor - pos.golesContra) < 0 ? 'color: red;' : 'color: black;')}">0</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+    <div class="groups-container" th:if="${sorteoRealizado}">
+        <div th:each="entry : ${tablasPosiciones}" class="group-card">
+            <h2 th:text="'GRUPO ' + ${entry.key}">GRUPO A</h2>
+            <table class="fifa-table">
+                <thead>
+                    <tr>
+                        <th style="text-align: left;">SELECCIÓN</th>
+                        <th>PJ</th>
+                        <th>GF</th>
+                        <th>DIF</th>
+                        <th style="color: var(--fifa-neon);">PTS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="pos : ${entry.value}">
+                        <td class="team-name" th:text="${pos.equipo.nombreEquipo}">GUATEMALA</td>
+                        <td th:text="${pos.partidosJugados}">0</td>
+                        <td th:text="${pos.golesFavor}">0</td>
+                        <td th:text="${pos.golesFavor - pos.golesContra}">0</td>
+                        <td class="pts-col" th:text="${pos.puntos}">0</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 

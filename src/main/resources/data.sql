@@ -1,6 +1,3 @@
-TRUNCATE TABLE amonestaciones, goles, partidos, jugadores, equipos, paises, estadios, posiciones, fases RESTART IDENTITY CASCADE;
-
--- Aquí ya sigue todo tu código de INSERT INTO paises...
 
 -- Paises
 INSERT INTO paises (nombre) VALUES ('México');

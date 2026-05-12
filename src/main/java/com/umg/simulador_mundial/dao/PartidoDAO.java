@@ -25,8 +25,11 @@ public class PartidoDAO {
         Timestamp ts = rs.getTimestamp("fecha_hora");
         if (ts != null) p.setFechaHora(ts.toLocalDateTime());
         
-        p.setGolesLocal(rs.getInt("goles_local"));
-        p.setGolesVisitante(rs.getInt("goles_visitante"));
+        p.setGolesLocal(rs.getObject("goles_local") != null ? rs.getInt("goles_local") : null);
+        p.setGolesVisitante(rs.getObject("goles_visitante") != null ? rs.getInt("goles_visitante") : null);
+        
+        // Mapeamos el estado para que el controlador sepa si está PENDIENTE o FINALIZADO
+        p.setEstado(rs.getString("estado"));
 
         // Mapeo básico de objetos relacionados (Llaves Foráneas)
         Fase f = new Fase();
@@ -77,7 +80,7 @@ public class PartidoDAO {
 
     public void save(Partido partido) {
         if (partido.getId() == null) {
-            String sql = "INSERT INTO partidos (fecha_hora, id_estadio, id_fase, id_equipo_local, id_equipo_visitante, goles_local, goles_visitante) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO partidos (fecha_hora, id_estadio, id_fase, id_equipo_local, id_equipo_visitante, goles_local, goles_visitante, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
             try (Connection con = dataSource.getConnection();
                  PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
                  
@@ -86,8 +89,19 @@ public class PartidoDAO {
                 ps.setLong(3, partido.getFase().getId());
                 ps.setLong(4, partido.getEquipoLocal().getId());
                 ps.setLong(5, partido.getEquipoVisitante().getId());
-                ps.setInt(6, partido.getGolesLocal());
-                ps.setInt(7, partido.getGolesVisitante());
+                
+                if (partido.getGolesLocal() != null) {
+                    ps.setInt(6, partido.getGolesLocal());
+                } else {
+                    ps.setNull(6, Types.INTEGER);
+                }
+                
+                if (partido.getGolesVisitante() != null) {
+                    ps.setInt(7, partido.getGolesVisitante());
+                } else {
+                    ps.setNull(7, Types.INTEGER);
+                }
+                ps.setString(8, partido.getEstado());
                 ps.executeUpdate();
                 
                 // Recuperar el ID generado para la base de datos
@@ -98,7 +112,7 @@ public class PartidoDAO {
                 }
             } catch (SQLException e) { System.err.println("Error al insertar partido: " + e.getMessage()); }
         } else {
-            String sql = "UPDATE partidos SET fecha_hora = ?, id_estadio = ?, id_fase = ?, id_equipo_local = ?, id_equipo_visitante = ?, goles_local = ?, goles_visitante = ? WHERE id_partido = ?";
+            String sql = "UPDATE partidos SET fecha_hora = ?, id_estadio = ?, id_fase = ?, id_equipo_local = ?, id_equipo_visitante = ?, goles_local = ?, goles_visitante = ?, estado = ? WHERE id_partido = ?";
             try (Connection con = dataSource.getConnection();
                  PreparedStatement ps = con.prepareStatement(sql)) {
                  
@@ -107,9 +121,20 @@ public class PartidoDAO {
                 ps.setLong(3, partido.getFase().getId());
                 ps.setLong(4, partido.getEquipoLocal().getId());
                 ps.setLong(5, partido.getEquipoVisitante().getId());
-                ps.setInt(6, partido.getGolesLocal());
-                ps.setInt(7, partido.getGolesVisitante());
-                ps.setLong(8, partido.getId());
+                
+                if (partido.getGolesLocal() != null) {
+                    ps.setInt(6, partido.getGolesLocal());
+                } else {
+                    ps.setNull(6, Types.INTEGER);
+                }
+                
+                if (partido.getGolesVisitante() != null) {
+                    ps.setInt(7, partido.getGolesVisitante());
+                } else {
+                    ps.setNull(7, Types.INTEGER);
+                }
+                ps.setString(8, partido.getEstado());
+                ps.setLong(9, partido.getId());
                 ps.executeUpdate();
             } catch (SQLException e) { System.err.println("Error al actualizar partido: " + e.getMessage()); }
         }
