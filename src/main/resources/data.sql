@@ -52,7 +52,24 @@ INSERT INTO paises (nombre) VALUES ('Guatemala');
 
 INSERT INTO fases (descripcion) VALUES ('Grupos'), ('Octavos'), ('Cuartos'), ('Semifinal'), ('Final');
 INSERT INTO posiciones (descripcion) VALUES ('Portero'), ('Defensa'), ('Mediocampista'), ('Delantero');
-INSERT INTO estadios (nombre, ciudad) VALUES ('Estadio Doroteo Guamuch', 'Ciudad de Guatemala'), ('Lusail', 'Doha');
+
+--EStadios
+INSERT INTO estadios (nombre_estadio, capacidad, ubicacion) VALUES ('Estadio Azteca', 87523, 'Ciudad de México');
+INSERT INTO estadios (nombre_estadio, capacidad, ubicacion) VALUES ('Estadio BBVA', 53500, 'Monterrey');
+INSERT INTO estadios (nombre_estadio, capacidad, ubicacion) VALUES ('Estadio Akron', 48071, 'Guadalajara');
+INSERT INTO estadios (nombre_estadio, capacidad, ubicacion) VALUES ('MetLife Stadium', 82500, 'New York/New Jersey');
+INSERT INTO estadios (nombre_estadio, capacidad, ubicacion) VALUES ('AT&T Stadium', 80000, 'Dallas');
+INSERT INTO estadios (nombre_estadio, capacidad, ubicacion) VALUES ('Mercedes-Benz Stadium', 71000, 'Atlanta');
+INSERT INTO estadios (nombre_estadio, capacidad, ubicacion) VALUES ('SoFi Stadium', 70240, 'Los Angeles');
+INSERT INTO estadios (nombre_estadio, capacidad, ubicacion) VALUES ('Lincoln Financial Field', 69796, 'Philadelphia');
+INSERT INTO estadios (nombre_estadio, capacidad, ubicacion) VALUES ('Lumen Field', 69000, 'Seattle');
+INSERT INTO estadios (nombre_estadio, capacidad, ubicacion) VALUES ('Levis Stadium', 68500, 'San Francisco Bay Area');
+INSERT INTO estadios (nombre_estadio, capacidad, ubicacion) VALUES ('Gillette Stadium', 65878, 'Boston');
+INSERT INTO estadios (nombre_estadio, capacidad, ubicacion) VALUES ('NRG Stadium', 72220, 'Houston');
+INSERT INTO estadios (nombre_estadio, capacidad, ubicacion) VALUES ('Hard Rock Stadium', 64767, 'Miami');
+INSERT INTO estadios (nombre_estadio, capacidad, ubicacion) VALUES ('Arrowhead Stadium', 76416, 'Kansas City');
+INSERT INTO estadios (nombre_estadio, capacidad, ubicacion) VALUES ('BC Place', 54500, 'Vancouver');
+INSERT INTO estadios (nombre_estadio, capacidad, ubicacion) VALUES ('BMO Field', 30000, 'Toronto');
 
 --Selecciones
 INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('México', 1);

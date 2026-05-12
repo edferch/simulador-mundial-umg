@@ -97,6 +97,33 @@ public class JugadorDAO {
         return lista;
     }
 
+    // EL CÁLCULO DEL GUANTE DE ORO (MENOS GOLEADOS)
+    public List<Jugador> findTop5Porteros() {
+        List<Jugador> lista = new ArrayList<>();
+        String sql = "SELECT j.id_jugador, j.nombre_completo, j.numero_camiseta, j.id_equipo, " +
+                     "p.id_posicion, p.descripcion AS desc_posicion, " +
+                     "COALESCE((SELECT SUM(CASE WHEN pa.id_equipo_local = j.id_equipo THEN pa.goles_visitante " +
+                     "                          WHEN pa.id_equipo_visitante = j.id_equipo THEN pa.goles_local ELSE 0 END) " +
+                     "          FROM partidos pa " +
+                     "          WHERE (pa.id_equipo_local = j.id_equipo OR pa.id_equipo_visitante = j.id_equipo) " +
+                     "          AND pa.estado = 'FINALIZADO'), 0) AS total_recibidos " +
+                     "FROM jugadores j " +
+                     "JOIN posiciones p ON j.id_posicion = p.id_posicion " +
+                     "WHERE p.descripcion ILIKE '%Portero%' OR p.id_posicion = 1 " +
+                     "ORDER BY total_recibidos ASC LIMIT 5";
+
+        try (Connection con = dataSource.getConnection();
+             Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+            while (rs.next()) {
+                Jugador j = mapearJugador(rs);
+                j.setGolesRecibidos(rs.getInt("total_recibidos")); 
+                lista.add(j);
+            }
+        } catch (SQLException e) { System.err.println("Error al buscar porteros: " + e.getMessage()); }
+        return lista;
+    }
+
     public void save(Jugador jugador) {
         if (jugador.getId() == null) {
             String sql = "INSERT INTO jugadores (nombre_completo, numero_camiseta, id_equipo, id_posicion) VALUES (?, ?, ?, ?)";

@@ -17,6 +17,7 @@ public class PartidoDAO {
 
     @Autowired private DataSource dataSource;
     @Autowired private EquipoDAO equipoDao;
+    @Autowired private EstadioDAO estadioDao;
 
     private Partido mapearPartido(ResultSet rs) throws SQLException {
         Partido p = new Partido();
@@ -28,17 +29,22 @@ public class PartidoDAO {
         p.setGolesLocal(rs.getObject("goles_local") != null ? rs.getInt("goles_local") : null);
         p.setGolesVisitante(rs.getObject("goles_visitante") != null ? rs.getInt("goles_visitante") : null);
         
-        // Mapeamos el estado para que el controlador sepa si está PENDIENTE o FINALIZADO
-        p.setEstado(rs.getString("estado"));
+        // Deducimos el estado en base a los goles para no depender de la base de datos
+        if (rs.getObject("goles_local") != null && rs.getObject("goles_visitante") != null) {
+            p.setEstado("FINALIZADO");
+        } else {
+            p.setEstado("PENDIENTE");
+        }
 
         // Mapeo básico de objetos relacionados (Llaves Foráneas)
         Fase f = new Fase();
         f.setId(rs.getLong("id_fase"));
         p.setFase(f);
 
-        Estadio est = new Estadio();
-        est.setId(rs.getLong("id_estadio"));
-        p.setEstadio(est);
+        long idEstadio = rs.getLong("id_estadio");
+        if (!rs.wasNull()) {
+            p.setEstadio(estadioDao.findById(idEstadio));
+        }
 
         // Usamos EquipoDAO para traer los equipos completos
         p.setEquipoLocal(equipoDao.findById(rs.getLong("id_equipo_local")));
@@ -80,15 +86,36 @@ public class PartidoDAO {
 
     public void save(Partido partido) {
         if (partido.getId() == null) {
-            String sql = "INSERT INTO partidos (fecha_hora, id_estadio, id_fase, id_equipo_local, id_equipo_visitante, goles_local, goles_visitante, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO partidos (fecha_hora, id_estadio, id_fase, id_equipo_local, id_equipo_visitante, goles_local, goles_visitante) VALUES (?, ?, ?, ?, ?, ?, ?)";
             try (Connection con = dataSource.getConnection();
                  PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
                  
                 ps.setTimestamp(1, partido.getFechaHora() != null ? Timestamp.valueOf(partido.getFechaHora()) : null);
-                ps.setLong(2, partido.getEstadio().getId());
-                ps.setLong(3, partido.getFase().getId());
-                ps.setLong(4, partido.getEquipoLocal().getId());
-                ps.setLong(5, partido.getEquipoVisitante().getId());
+                
+                if (partido.getEstadio() != null && partido.getEstadio().getId() != null) {
+                    ps.setLong(2, partido.getEstadio().getId());
+                } else {
+                    ps.setNull(2, Types.BIGINT);
+                }
+                
+                if (partido.getFase() != null && partido.getFase().getId() != null) {
+                    ps.setLong(3, partido.getFase().getId());
+                } else {
+                    ps.setNull(3, Types.BIGINT);
+                }
+                
+                if (partido.getEquipoLocal() != null && partido.getEquipoLocal().getId() != null) {
+                    ps.setLong(4, partido.getEquipoLocal().getId());
+                } else {
+                    ps.setNull(4, Types.BIGINT);
+                }
+                
+                if (partido.getEquipoVisitante() != null && partido.getEquipoVisitante().getId() != null) {
+                    ps.setLong(5, partido.getEquipoVisitante().getId());
+                } else {
+                    ps.setNull(5, Types.BIGINT);
+                }
+                
                 
                 if (partido.getGolesLocal() != null) {
                     ps.setInt(6, partido.getGolesLocal());
@@ -101,7 +128,6 @@ public class PartidoDAO {
                 } else {
                     ps.setNull(7, Types.INTEGER);
                 }
-                ps.setString(8, partido.getEstado());
                 ps.executeUpdate();
                 
                 // Recuperar el ID generado para la base de datos
@@ -112,7 +138,7 @@ public class PartidoDAO {
                 }
             } catch (SQLException e) { System.err.println("Error al insertar partido: " + e.getMessage()); }
         } else {
-            String sql = "UPDATE partidos SET fecha_hora = ?, id_estadio = ?, id_fase = ?, id_equipo_local = ?, id_equipo_visitante = ?, goles_local = ?, goles_visitante = ?, estado = ? WHERE id_partido = ?";
+            String sql = "UPDATE partidos SET fecha_hora = ?, id_estadio = ?, id_fase = ?, id_equipo_local = ?, id_equipo_visitante = ?, goles_local = ?, goles_visitante = ? WHERE id_partido = ?";
             try (Connection con = dataSource.getConnection();
                  PreparedStatement ps = con.prepareStatement(sql)) {
                  
@@ -133,8 +159,7 @@ public class PartidoDAO {
                 } else {
                     ps.setNull(7, Types.INTEGER);
                 }
-                ps.setString(8, partido.getEstado());
-                ps.setLong(9, partido.getId());
+                ps.setLong(8, partido.getId());
                 ps.executeUpdate();
             } catch (SQLException e) { System.err.println("Error al actualizar partido: " + e.getMessage()); }
         }

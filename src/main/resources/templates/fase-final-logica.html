@@ -20,7 +20,7 @@
             </form>
             
             <div th:if="${error}" class="alert-error" style="max-width: 600px; margin: 20px auto;">
-                v>
+            </div>
         </div>
 
         <div class="bracket-wrapper-split">
@@ -30,12 +30,12 @@
                     <a th:each="p, stat : ${octavos}" th:if="${stat.index < 4}" th:href="@{/simulacion/partido/{id}(id=${p.id})}" class="match-node-link">
                         <div class="match-node-fifa" th:classappend="${p.estado.contains('FINALIZADO') ? 'node-finalized' : 'node-pending'}">
                             <div class="node-team-row">
-                                <span class="node-team-name" th:text="${p.equipoLocal.abreviatura}"></span>
-                                <span class="node-score" th:text="${p.golesLocal}">0</span>
+                                <span class="node-team-name" th:text="${p.equipoLocal.nombreEquipo}"></span>
+                                <span class="node-score" th:text="${p.golesLocal ?: '-'}">0</span>
                             </div>
                             <div class="node-team-row">
-                                <span class="node-team-name" th:text="${p.equipoVisitante.abreviatura}"></span>
-                                <span class="node-score" th:text="${p.golesVisitante}">0</span>
+                                <span class="node-team-name" th:text="${p.equipoVisitante.nombreEquipo}"></span>
+                                <span class="node-score" th:text="${p.golesVisitante ?: '-'}">0</span>
                             </div>
                         </div>
                     </a>
@@ -44,8 +44,8 @@
                 <div class="round-column">
                     <a th:each="p, stat : ${cuartos}" th:if="${stat.index < 2}" th:href="@{/simulacion/partido/{id}(id=${p.id})}" class="match-node-link">
                         <div class="match-node-fifa" th:classappend="${p.estado.contains('FINALIZADO') ? 'node-finalized' : 'node-pending'}">
-                            <div class="node-team-row"><span th:text="${p.equipoLocal != null ? p.equipoLocal.abreviatura : '???'}"></span><span class="node-score" th:text="${p.golesLocal}">0</span></div>
-                            <div class="node-team-row"><span th:text="${p.equipoVisitante != null ? p.equipoVisitante.abreviatura : '???'}"></span><span class="node-score" th:text="${p.golesVisitante}">0</span></div>
+                            <div class="node-team-row"><span th:text="${p.equipoLocal != null ? p.equipoLocal.nombreEquipo : '???'}"></span><span class="node-score" th:text="${p.golesLocal ?: '-'}">0</span></div>
+                            <div class="node-team-row"><span th:text="${p.equipoVisitante != null ? p.equipoVisitante.nombreEquipo : '???'}"></span><span class="node-score" th:text="${p.golesVisitante ?: '-'}">0</span></div>
                         </div>
                     </a>
                 </div>
@@ -53,8 +53,8 @@
                 <div class="round-column">
                     <a th:each="p, stat : ${semis}" th:if="${stat.index == 0}" th:href="@{/simulacion/partido/{id}(id=${p.id})}" class="match-node-link">
                         <div class="match-node-fifa" th:classappend="${p.estado.contains('FINALIZADO') ? 'node-finalized' : 'node-pending'}">
-                            <div class="node-team-row"><span th:text="${p.equipoLocal != null ? p.equipoLocal.abreviatura : '???'}"></span><span class="node-score" th:text="${p.golesLocal}">0</span></div>
-                            <div class="node-team-row"><span th:text="${p.equipoVisitante != null ? p.equipoVisitante.abreviatura : '???'}"></span><span class="node-score" th:text="${p.golesVisitante}">0</span></div>
+                            <div class="node-team-row"><span th:text="${p.equipoLocal != null ? p.equipoLocal.nombreEquipo : '???'}"></span><span class="node-score" th:text="${p.golesLocal ?: '-'}">0</span></div>
+                            <div class="node-team-row"><span th:text="${p.equipoVisitante != null ? p.equipoVisitante.nombreEquipo : '???'}"></span><span class="node-score" th:text="${p.golesVisitante ?: '-'}">0</span></div>
                         </div>
                     </a>
                 </div>
@@ -65,12 +65,12 @@
                 <a th:each="p : ${finales}" th:href="@{/simulacion/partido/{id}(id=${p.id})}" class="match-node-link">
                     <div class="match-node-fifa final-match-tile">
                         <div class="node-team-row">
-                            <span th:text="${p.equipoLocal != null ? p.equipoLocal.nombre : '???'}"></span>
-                            <span class="node-score" th:text="${p.golesLocal}">0</span>
+                            <span th:text="${p.equipoLocal != null ? p.equipoLocal.nombreEquipo : '???'}"></span>
+                            <span class="node-score" th:text="${p.golesLocal ?: '-'}">0</span>
                         </div>
                         <div class="node-team-row">
-                            <span th:text="${p.equipoVisitante != null ? p.equipoVisitante.nombre : '???'}"></span>
-                            <span class="node-score" th:text="${p.golesVisitante}">0</span>
+                            <span th:text="${p.equipoVisitante != null ? p.equipoVisitante.nombreEquipo : '???'}"></span>
+                            <span class="node-score" th:text="${p.golesVisitante ?: '-'}">0</span>
                         </div>
                     </div>
                 </a>
@@ -81,8 +81,8 @@
                 <div class="round-column right-aligned-cols">
                     <a th:each="p, stat : ${semis}" th:if="${stat.index == 1}" th:href="@{/simulacion/partido/{id}(id=${p.id})}" class="match-node-link">
                         <div class="match-node-fifa" th:classappend="${p.estado.contains('FINALIZADO') ? 'node-finalized' : 'node-pending'}">
-                            <div class="node-team-row"><span th:text="${p.equipoLocal != null ? p.equipoLocal.abreviatura : '???'}"></span><span class="node-score" th:text="${p.golesLocal}">0</span></div>
-                            <div class="node-team-row"><span th:text="${p.equipoVisitante != null ? p.equipoVisitante.abreviatura : '???'}"></span><span class="node-score" th:text="${p.golesVisitante}">0</span></div>
+                            <div class="node-team-row"><span th:text="${p.equipoLocal != null ? p.equipoLocal.nombreEquipo : '???'}"></span><span class="node-score" th:text="${p.golesLocal ?: '-'}">0</span></div>
+                            <div class="node-team-row"><span th:text="${p.equipoVisitante != null ? p.equipoVisitante.nombreEquipo : '???'}"></span><span class="node-score" th:text="${p.golesVisitante ?: '-'}">0</span></div>
                         </div>
                     </a>
                 </div>
@@ -90,8 +90,8 @@
                 <div class="round-column right-aligned-cols">
                     <a th:each="p, stat : ${cuartos}" th:if="${stat.index >= 2}" th:href="@{/simulacion/partido/{id}(id=${p.id})}" class="match-node-link">
                         <div class="match-node-fifa" th:classappend="${p.estado.contains('FINALIZADO') ? 'node-finalized' : 'node-pending'}">
-                            <div class="node-team-row"><span th:text="${p.equipoLocal != null ? p.equipoLocal.abreviatura : '???'}"></span><span class="node-score" th:text="${p.golesLocal}">0</span></div>
-                            <div class="node-team-row"><span th:text="${p.equipoVisitante != null ? p.equipoVisitante.abreviatura : '???'}"></span><span class="node-score" th:text="${p.golesVisitante}">0</span></div>
+                            <div class="node-team-row"><span th:text="${p.equipoLocal != null ? p.equipoLocal.nombreEquipo : '???'}"></span><span class="node-score" th:text="${p.golesLocal ?: '-'}">0</span></div>
+                            <div class="node-team-row"><span th:text="${p.equipoVisitante != null ? p.equipoVisitante.nombreEquipo : '???'}"></span><span class="node-score" th:text="${p.golesVisitante ?: '-'}">0</span></div>
                         </div>
                     </a>
                 </div>
@@ -100,8 +100,8 @@
                     <div style="text-align: center; color: #555; font-size: 0.7rem; margin-bottom: 10px; letter-spacing: 2px;">OCTAVOS DER</div>
                     <a th:each="p, stat : ${octavos}" th:if="${stat.index >= 4}" th:href="@{/simulacion/partido/{id}(id=${p.id})}" class="match-node-link">
                         <div class="match-node-fifa" th:classappend="${p.estado.contains('FINALIZADO') ? 'node-finalized' : 'node-pending'}">
-                            <div class="node-team-row"><span th:text="${p.equipoLocal.abreviatura}"></span><span class="node-score" th:text="${p.golesLocal}">0</span></div>
-                            <div class="node-team-row"><span th:text="${p.equipoVisitante.abreviatura}"></span><span class="node-score" th:text="${p.golesVisitante}">0</span></div>
+                            <div class="node-team-row"><span th:text="${p.equipoLocal.nombreEquipo}"></span><span class="node-score" th:text="${p.golesLocal ?: '-'}">0</span></div>
+                            <div class="node-team-row"><span th:text="${p.equipoVisitante.nombreEquipo}"></span><span class="node-score" th:text="${p.golesVisitante ?: '-'}">0</span></div>
                         </div>
                     </a>
                 </div>
@@ -109,21 +109,22 @@
         </div>
 
         <div th:if="${torneoTerminado}" style="margin-top: 50px; padding: 40px; background: rgba(209, 245, 10, 0.05); border: 2px solid var(--fifa-neon); border-radius: 12px; text-align: center;">
-            <h1 style="color: var(--fifa-neon); font-size: 3rem; margin-bottom: 0;">¡NUEVO CAMPEÓN MUNDIAL!</h1>sfs:rm30px var(--fifa-neon);"></h1>
+            <h1 style="color: var(--fifa-neon); font-size: 3rem; margin-bottom: 0;">¡NUEVO CAMPEÓN MUNDIAL!</h1>
+            <h1 th:if="${campeon != null}" th:text="${campeon.nombreEquipo}" style="font-size: 4rem; margin-top: 10px; color: white; text-shadow: 0 0 30px var(--fifa-neon);"></h1>
             
             <div style="display: flex; justify-content: space-around; margin-top: 50px; text-align: left;">
                 <div style="background: rgba(0,0,0,0.4); padding: 25px; border-radius: 10px; width: 45%; border-left: 5px solid var(--fifa-red);">
                     <h2 style="color: var(--fifa-red); text-transform: uppercase; font-style: italic;">BOTA DE ORO</h2>
-                    <div th:each="j, stat : ${goleadores}" th:if="${stat.index < 5}" style="margin-bottom: 10px; font-size: 1.2rem; border-bottom: 1px solid #333; padding-bottom: 5px;">
-                        <span th:text="${j.nombre}" style="font-weight: bold;"></span> 
-                     o  <span style="float: right; color: var(--fifa-neon);" th:text="${j.golesAnotados} + ' G'"></span>
+                    <div th:each="j, stat : ${goleadores}" th:if="${stat.index == 0}" style="margin-bottom: 10px; font-size: 1.6rem; padding-bottom: 5px;">
+                        <span th:text="'🏆 ' + ${j.nombreCompleto}" style="font-weight: bold;"></span> 
+                        <span style="float: right; color: var(--fifa-neon);" th:text="${j.golesAnotados} + ' G'"></span>
                     </div>
                 </div>
 
                 <div style="background: rgba(0,0,0,0.4); padding: 25px; border-radius: 10px; width: 45%; border-left: 5px solid var(--fifa-cyan);">
                     <h2 style="color: var(--fifa-cyan); text-transform: uppercase; font-style: italic;">GUANTE DE ORO</h2>
-                    <div th:each="p, stat : ${porteros}" th:if="${stat.index < 5}" style="margin-bottom: 10px; font-size: 1.2rem; border-bottom: 1px solid #333; padding-bottom: 5px;">
-                        <span th:text="${p.nombre}" style="font-weight: bold;"></span>
+                    <div th:each="p, stat : ${porteros}" th:if="${stat.index == 0}" style="margin-bottom: 10px; font-size: 1.6rem; padding-bottom: 5px;">
+                        <span th:text="'🧤 ' + ${p.nombreCompleto}" style="font-weight: bold;"></span>
                         <span style="float: right; color: var(--fifa-cyan);" th:text="${p.golesRecibidos} + ' GR'"></span>
                     </div>
                 </div>

@@ -8,8 +8,8 @@ public class Partido {
     private Fase fase;
     private Equipo equipoLocal;
     private Equipo equipoVisitante;
-    private Integer golesLocal = 0;
-    private Integer golesVisitante = 0;
+    private Integer golesLocal = null;
+    private Integer golesVisitante = null;
     private String estado = "PENDIENTE";
 
     public Partido() {}

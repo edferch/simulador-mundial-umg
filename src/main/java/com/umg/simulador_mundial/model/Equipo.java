@@ -12,6 +12,11 @@ public class Equipo {
     public void setId(Long id) { this.id = id; }
     public String getNombreEquipo() { return nombreEquipo; }
     public void setNombreEquipo(String nombreEquipo) { this.nombreEquipo = nombreEquipo; }
+    
+    // Alias de compatibilidad para evitar errores en Thymeleaf si busca .nombre
+    public String getNombre() { return nombreEquipo; }
+    public void setNombre(String nombre) { this.nombreEquipo = nombre; }
+
     public Pais getPais() { return pais; }
     public void setPais(Pais pais) { this.pais = pais; }
     public String getGrupo() { return grupo; }
