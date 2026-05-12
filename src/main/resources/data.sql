@@ -1,3 +1,7 @@
+TRUNCATE TABLE amonestaciones, goles, partidos, jugadores, equipos, paises, estadios, posiciones, fases RESTART IDENTITY CASCADE;
+
+-- Aquí ya sigue todo tu código de INSERT INTO paises...
+
 -- Paises
 INSERT INTO paises (nombre) VALUES ('México');
 INSERT INTO paises (nombre) VALUES ('Sudáfrica');
@@ -54,54 +58,54 @@ INSERT INTO posiciones (descripcion) VALUES ('Portero'), ('Defensa'), ('Mediocam
 INSERT INTO estadios (nombre, ciudad) VALUES ('Estadio Doroteo Guamuch', 'Ciudad de Guatemala'), ('Lusail', 'Doha');
 
 --Selecciones
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('México', 1, 'A');
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('Sudáfrica', 2, 'A');
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('Corea del Sur', 3, 'A');
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('Chequia', 4, 'A');
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('Canadá', 5, 'B');
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('Bosnia y Herzegovina', 6, 'B');
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('Catar', 7, 'B');
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('Suiza', 8, 'B');
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('Brasil', 9, 'C');
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('Marruecos', 10, 'C');
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('Haití', 11, 'C');
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('Escocia', 12, 'C');
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('Estados Unidos', 13, 'D');
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('Paraguay', 14, 'D');
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('Australia', 15, 'D');
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('Turquía', 16, 'D');
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('Alemania', 17, 'E');
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('Curazao', 18, 'E');
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('Costa de Marfil', 19, 'E');
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('Ecuador', 20, 'E');
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('Países Bajos', 21, 'F');
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('Japón', 22, 'F');
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('Suecia', 23, 'F');
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('Túnez', 24, 'F');
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('Bélgica', 25, 'G');
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('Egipto', 26, 'G');
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('Irán', 27, 'G');
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('Nueva Zelanda', 28, 'G');
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('España', 29, 'H');
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('Cabo Verde', 30, 'H');
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('Arabia Saudita', 31, 'H');
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('Uruguay', 32, 'H');
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('Francia', 33, 'I');
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('Senegal', 34, 'I');
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('Irak', 35, 'I');
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('Noruega', 36, 'I');
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('Argentina', 37, 'J');
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('Argelia', 38, 'J');
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('Austria', 39, 'J');
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('Jordania', 40, 'J');
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('Portugal', 41, 'K');
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('RD del Congo', 42, 'K');
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('Uzbekistán', 43, 'K');
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('Colombia', 44, 'K');
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('Inglaterra', 45, 'L');
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('Croacia', 46, 'L');
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('Ghana', 47, 'L');
-INSERT INTO equipos (nombre_equipo, id_pais, grupo) VALUES ('Guatemala', 48, 'L');
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('México', 1);
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('Sudáfrica', 2);
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('Corea del Sur', 3);
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('Chequia', 4);
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('Canadá', 5);
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('Bosnia y Herzegovina', 6);
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('Catar', 7);
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('Suiza', 8);
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('Brasil', 9);
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('Marruecos', 10);
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('Haití', 11);
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('Escocia', 12);
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('Estados Unidos', 13);
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('Paraguay', 14);
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('Australia', 15);
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('Turquía', 16);
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('Alemania', 17);
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('Curazao', 18);
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('Costa de Marfil', 19);
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('Ecuador', 20);
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('Países Bajos', 21);
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('Japón', 22);
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('Suecia', 23);
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('Túnez', 24);
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('Bélgica', 25);
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('Egipto', 26);
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('Irán', 27);
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('Nueva Zelanda', 28);
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('España', 29);
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('Cabo Verde', 30);
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('Arabia Saudita', 31);
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('Uruguay', 32);
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('Francia', 33);
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('Senegal', 34);
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('Irak', 35);
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('Noruega', 36);
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('Argentina', 37);
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('Argelia', 38);
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('Austria', 39);
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('Jordania', 40);
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('Portugal', 41);
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('RD del Congo', 42);
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('Uzbekistán', 43);
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('Colombia', 44);
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('Inglaterra', 45);
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('Croacia', 46);
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('Ghana', 47);
+INSERT INTO equipos (nombre_equipo, id_pais) VALUES ('Guatemala', 48);
 
 --Jugadores
 --Mexico

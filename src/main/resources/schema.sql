@@ -34,7 +34,7 @@ CREATE TABLE equipos (
     id_equipo SERIAL PRIMARY KEY,
     nombre_equipo VARCHAR(50) NOT NULL,
     id_pais INT NOT NULL,
-    grupo CHAR(1) NOT NULL,
+    grupo CHAR(1),
     CONSTRAINT fk_equipo_pais FOREIGN KEY (id_pais) REFERENCES paises(id_pais)
 );
 
