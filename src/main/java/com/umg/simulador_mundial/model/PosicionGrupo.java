@@ -1,7 +1,5 @@
 package com.umg.simulador_mundial.model;
 
-// NOTA: Esta clase NO lleva @Entity porque no se guarda en la base de datos.
-// Solo vive en la memoria RAM (Cumple el 10% de Manejo de Memoria de la rúbrica)
 public class PosicionGrupo implements Comparable<PosicionGrupo> {
     
     private Equipo equipo;
@@ -15,7 +13,6 @@ public class PosicionGrupo implements Comparable<PosicionGrupo> {
         this.equipo = equipo;
     }
 
-    // Método para registrar el resultado de un partido
     public void registrarPartido(int golesAnotados, int golesRecibidos) {
         this.partidosJugados++;
         this.golesFavor += golesAnotados;
@@ -23,19 +20,16 @@ public class PosicionGrupo implements Comparable<PosicionGrupo> {
         this.diferenciaGoles = this.golesFavor - this.golesContra;
 
         if (golesAnotados > golesRecibidos) {
-            this.puntos += 3; // Victoria
+            this.puntos += 3;
         } else if (golesAnotados == golesRecibidos) {
-            this.puntos += 1; // Empate
+            this.puntos += 1;
         }
-        // Derrota suma 0, por lo que no hacemos nada
     }
 
-    // Algoritmo de Ordenamiento (Cumple el 20% de Lógica y Algoritmos)
-    // Criterios FIFA: 1. Puntos, 2. Diferencia Goles, 3. Goles a Favor
     @Override
     public int compareTo(PosicionGrupo otra) {
         if (this.puntos != otra.puntos) {
-            return Integer.compare(otra.puntos, this.puntos); // Orden descendente
+            return Integer.compare(otra.puntos, this.puntos);
         }
         if (this.diferenciaGoles != otra.diferenciaGoles) {
             return Integer.compare(otra.diferenciaGoles, this.diferenciaGoles);
@@ -43,7 +37,6 @@ public class PosicionGrupo implements Comparable<PosicionGrupo> {
         return Integer.compare(otra.golesFavor, this.golesFavor);
     }
 
-    // Getters
     public Equipo getEquipo() { return equipo; }
     public int getPuntos() { return puntos; }
     public int getPartidosJugados() { return partidosJugados; }

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Sedes y Estadios - FIFA UMG</title>
+    <link th:href="@{/css/fifa-style.css}" rel="stylesheet">
+</head>
+<body style="background: linear-gradient(to bottom, #001a4d, #000b21); min-height: 100vh; padding: 20px;">
+
+    <div class="main-card" style="background: transparent; border: none; box-shadow: none;">
+        
+        <div style="text-align: center; margin-bottom: 40px;">
+            <div style="background: #001a4d; display: inline-block; padding: 10px 30px; border-radius: 10px; border: 1px solid var(--fifa-cyan);">
+                <p style="color: white; margin: 0; font-size: 0.8rem; letter-spacing: 2px;">GESTIÓN OFICIAL DE</p>
+                <h1 style="color: var(--fifa-cyan); margin: 0; font-size: 2.5rem; font-style: italic;">SEDES Y ESTADIOS</h1>
+            </div>
+        </div>
+
+        <!-- Malla o cuadrícula de Estadios -->
+        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px;">
+            <div th:each="estadio : ${estadios}" style="background: rgba(0,0,0,0.6); border: 1px solid #333; border-radius: 10px; padding: 20px; width: 300px; text-align: center; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                <div style="font-size: 3rem; margin-bottom: 10px;"></div>
+                <h2 style="color: white; margin-bottom: 5px; font-size: 1.3rem;" th:text="${estadio.nombre}">Nombre del Estadio</h2>
+                <p style="color: var(--fifa-cyan); font-weight: bold; margin-top: 0; font-size: 1.1rem;" th:text="' ' + ${estadio.ciudad}">Ciudad</p>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 50px;">
+            <a href="/" class="btn-fifa" style="background: var(--fifa-red);">REGRESAR AL MENÚ</a>
+        </div>
+    </div>
+
+</body>
+</html>
