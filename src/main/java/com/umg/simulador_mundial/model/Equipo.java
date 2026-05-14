@@ -2,27 +2,23 @@ package com.umg.simulador_mundial.model;
 
 import jakarta.persistence.*;
 
-// La etiqueta @Entity le dice a Spring Boot: "¡Oye! Convierte esta clase en una tabla de PostgreSQL"
 @Entity
 @Table(name = "equipos")
 public class Equipo {
 
-    // @Id le dice que esta es la Llave Primaria (Primary Key)
-    // @GeneratedValue hace que el ID sea auto-incrementable (1, 2, 3...)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String nombre; // Ejemplo: "Guatemala", "Brasil"
+    private String nombre;
 
     @Column(nullable = false, length = 3)
-    private String abreviatura; // Ejemplo: "GUA", "BRA" (Esto servirá mucho para el UI del partido)
+    private String abreviatura;
 
     private String entrenador;
 
 
-    // CONSTRUCTORES (Concepto clave de POO para tu rúbrica)
     public Equipo() {
     }
 
@@ -35,7 +31,6 @@ public class Equipo {
     private String grupo; 
 
 
-    // GETTERS Y SETTERS (Encapsulamiento, otro punto de tu rúbrica)
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

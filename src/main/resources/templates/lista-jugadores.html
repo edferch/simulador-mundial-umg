@@ -2,97 +2,90 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Jugadores - FIFA UMG</title>
-    <!-- Vinculamos tu archivo CSS externo -->
+    <title>Plantilla - FIFA UMG</title>
     <link th:href="@{/css/fifa-style.css}" rel="stylesheet">
 </head>
 <body>
 
-    <div class="main-card">
-        <h1>JUGADORES REGISTRADOS</h1>
-        <p>Gestión de plantilla - Mundial 2026</p>
-
-        <!-- Mensaje de error (Ej. cuando no se puede borrar un jugador) -->
-        <div th:if="${error}" class="alert-error">
-            <span th:text="${error}"></span>
-        </div>
-
-        <!-- Botón para agregar nuevo (estilo FIFA) -->
+    <div class="main-card" style="background: transparent; border: none; box-shadow: none;">
+        <h1 style="color: white; font-style: italic;">GESTIÓN DE PLANTILLAS</h1>
+        
         <div class="text-right mb-20">
-            <a href="/jugadores/nuevo" class="btn-fifa">
-                Registrar Nuevo Jugador
-            </a>
+            <a href="/jugadores/nuevo" class="btn-fifa" style="background: var(--fifa-neon); color: black;">+ Inscribir Jugador</a>
         </div>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Nombre</th>
-                    <th>Posición</th>
-                    <th>Número</th>
-                    <th>Equipo</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Iteramos los jugadores y asignamos clase y data-id para el clic derecho -->
-                <tr th:each="jugadorItem : ${jugadores}" class="jugador-row" th:data-id="${jugadorItem.id}">
-                    <td th:text="${jugadorItem.id}">1</td>
-                    <td th:text="${jugadorItem.nombre}" class="highlight-text"></td>
-                    <td th:text="${jugadorItem.posicion}"></td>
-                    <td th:text="${jugadorItem.numeroCamiseta}"></td>
-                    <!-- Asumimos que la entidad Jugador tiene una relación con Equipo y accedemos a su nombre -->
-                    <td th:text="${jugadorItem.equipo.nombre}"></td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="pitch-container">
+            
+            <div class="position-row">
+                <div th:each="j : ${jugadores}" th:if="${j.posicion == 'Delantero'}" class="fut-card jugador-row" th:data-id="${j.id}">
+                    <p class="card-rating">85</p>
+                    <p class="card-pos" th:text="${j.posicion}">ST</p>
+                    <div class="card-number" th:text="${j.numeroCamiseta}">10</div>
+                    <p class="card-name" th:text="${j.nombre}">NOMBRE</p>
+                    <p class="card-team" th:text="${j.equipo.nombre}">EQUIPO</p>
+                </div>
+            </div>
 
-        <!-- Botón de regreso -->
+            <div class="position-row">
+                <div th:each="j : ${jugadores}" th:if="${j.posicion == 'Mediocampista'}" class="fut-card jugador-row" th:data-id="${j.id}" style="background: linear-gradient(135deg, #50C8FF 0%, #2D23D3 100%); color: white;">
+                    <p class="card-rating">82</p>
+                    <p class="card-pos">MC</p>
+                    <div class="card-number" th:text="${j.numeroCamiseta}">8</div>
+                    <p class="card-name" th:text="${j.nombre}">NOMBRE</p>
+                    <p class="card-team" th:text="${j.equipo.nombre}">EQUIPO</p>
+                </div>
+            </div>
+
+            <div class="position-row">
+                <div th:each="j : ${jugadores}" th:if="${j.posicion == 'Defensa'}" class="fut-card jugador-row" th:data-id="${j.id}" style="background: linear-gradient(135deg, #E8F4EC 0%, #005B3A 100%); color: white;">
+                    <p class="card-rating">79</p>
+                    <p class="card-pos">DF</p>
+                    <div class="card-number" th:text="${j.numeroCamiseta}">4</div>
+                    <p class="card-name" th:text="${j.nombre}">NOMBRE</p>
+                    <p class="card-team" th:text="${j.equipo.nombre}">EQUIPO</p>
+                </div>
+            </div>
+
+            <div class="position-row">
+                <div th:each="j : ${jugadores}" th:if="${j.posicion == 'Portero'}" class="fut-card jugador-row" th:data-id="${j.id}" style="background: linear-gradient(135deg, #ddd 0%, #555 100%); color: white;">
+                    <p class="card-rating">88</p>
+                    <p class="card-pos">GK</p>
+                    <div class="card-number" th:text="${j.numeroCamiseta}">1</div>
+                    <p class="card-name" th:text="${j.nombre}">NOMBRE</p>
+                    <p class="card-team" th:text="${j.equipo.nombre}">EQUIPO</p>
+                </div>
+            </div>
+
+        </div>
+
         <div class="mt-20">
-            <a href="/" class="btn-fifa">Volver al Dashboard</a>
+            <a href="/" class="btn-fifa">Volver al Inicio</a>
         </div>
     </div>
 
-    <!-- Menú contextual oculto por defecto -->
     <div id="contextMenu" class="context-menu">
-        <a id="editOption" href="#">Editar</a>
-        <a id="deleteOption" href="#">Borrar</a>
+        <a id="editOption" href="#">✍️ Editar Ficha</a>
+        <a id="deleteOption" href="#" style="color: var(--fifa-red);">🗑️ Expulsar</a>
     </div>
 
-    <!-- Script para el menú contextual -->
     <script>
+        // Mismo script que ya tenías para el contextMenu...
         document.addEventListener("DOMContentLoaded", function() {
             const contextMenu = document.getElementById("contextMenu");
             const editOption = document.getElementById("editOption");
             const deleteOption = document.getElementById("deleteOption");
-
-            // Ocultar el menú al hacer clic izquierdo en cualquier parte de la página
-            document.addEventListener("click", function() {
-                contextMenu.style.display = "none";
-            });
-
-            // Mostrar el menú al hacer clic derecho en una de las filas (jugador-row)
+            document.addEventListener("click", () => contextMenu.style.display = "none");
             const rows = document.querySelectorAll(".jugador-row");
             rows.forEach(row => {
                 row.addEventListener("contextmenu", function(e) {
                     e.preventDefault();
-                    const jugadorId = this.getAttribute("data-id");
-                    
-                    // Asegurarnos de que las rutas apunten al controlador de jugadores
-                    editOption.href = "/jugadores/editar/" + jugadorId;
-                    deleteOption.href = "/jugadores/eliminar/" + jugadorId;
-                    
+                    const id = this.getAttribute("data-id");
+                    editOption.href = "/jugadores/editar/" + id;
+                    deleteOption.href = "/jugadores/eliminar/" + id;
                     contextMenu.style.display = "block";
                     contextMenu.style.left = e.pageX + "px";
                     contextMenu.style.top = e.pageY + "px";
                 });
-            });
-
-            // Confirmación antes de borrar
-            deleteOption.addEventListener("click", function(e) {
-                if(!confirm('¿Estás seguro de que quieres eliminar este jugador?')) {
-                    e.preventDefault();
-                }
             });
         });
     </script>

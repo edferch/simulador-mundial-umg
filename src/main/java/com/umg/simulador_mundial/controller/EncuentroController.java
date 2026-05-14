@@ -16,7 +16,6 @@ public class EncuentroController {
 
     @GetMapping
     public String listarEncuentros(Model model) {
-        // Traemos todos los partidos de la DB
         model.addAttribute("encuentros", encuentroRepository.findAll());
         return "lista-encuentros";
     }

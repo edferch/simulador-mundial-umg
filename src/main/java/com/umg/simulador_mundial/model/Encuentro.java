@@ -20,6 +20,11 @@ public class Encuentro {
     @JoinColumn(name = "visitante_id")
     private Equipo equipoVisitante;
 
+    @ManyToOne
+    @JoinColumn(name = "estadio_id")
+    private Estadio estadio;
+
+
     private Integer golesLocal = 0;
     private Integer golesVisitante = 0;
     private LocalDateTime fechaHora;
@@ -46,4 +51,7 @@ public class Encuentro {
 
     public String getEstado() { return estado; }
     public void setEstado(String estado) { this.estado = estado; }
+
+    public Estadio getEstadio() { return estadio; }
+    public void setEstadio(Estadio estadio) { this.estadio = estadio; }
 }

@@ -1,14 +1,20 @@
 package com.umg.simulador_mundial.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import com.umg.simulador_mundial.model.Jugador;
 import com.umg.simulador_mundial.repository.EquipoRepository;
 import com.umg.simulador_mundial.repository.JugadorRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.dao.DataIntegrityViolationException;
 
 @Controller
 @RequestMapping("/jugadores")
@@ -21,8 +27,15 @@ public class JugadorController {
     private EquipoRepository equipoRepository;
 
     @GetMapping
-    public String listarJugadores(Model model) {
-        model.addAttribute("jugadores", jugadorRepository.findAll());
+    public String listarJugadores(@RequestParam(name = "buscar", required = false) String buscar, Model model) {
+        if (buscar != null && !buscar.isEmpty()) {
+            // Si el usuario buscó algo, usamos el algoritmo de búsqueda
+            model.addAttribute("jugadores", jugadorRepository.findByNombreContainingIgnoreCase(buscar));
+            model.addAttribute("terminoBusqueda", buscar); // Guardamos la palabra para dejarla escrita en pantalla
+        } else {
+            // Si no buscó nada, mostramos todos
+            model.addAttribute("jugadores", jugadorRepository.findAll());
+        }
         return "lista-jugadores";
     }
 

@@ -1,50 +1,230 @@
-/* Variables de colores FIFA (Nueva Paleta) */
+/* =========================================
+   VARIABLES Y TEMA GLOBAL (ESTILO FIFA)
+   ========================================= */
 :root {
-    --fifa-neon: #D1F50A;
+    --fifa-neon: #D1F50A; /* Amarillo/Verde neón */
+    --fifa-cyan: #00FFCC; /* Cyan brillante */
     --fifa-green: #005B3A;
     --fifa-blue: #2D23D3;
     --fifa-red: #EA0036;
-    --fifa-light-bg: #E8F4EC;
+    --fifa-dark-bg: #0b0c10; /* Fondo principal oscuro */
+    --fifa-panel-bg: #1f2833; /* Fondo de tarjetas y paneles */
     --fifa-white: #FFFFFF;
-    --fifa-black: #111111;
+    --fifa-black: #000000;
 }
 
 body {
-    background-color: var(--fifa-light-bg);
-    color: var(--fifa-black);
+    background: radial-gradient(circle at top right, #1a0508, var(--fifa-dark-bg));
+    color: var(--fifa-white);
     font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     margin: 0;
     padding: 20px;
-    box-sizing: border-box;
-}
-
-/* Contenedor Principal (Dashboard) */
-.main-card {
-    background: var(--fifa-white);
-    padding: 40px;
-    border-radius: 10px;
-    border: 2px solid var(--fifa-green);
-    text-align: center;
-    box-shadow: 0 10px 30px rgba(0, 91, 58, 0.15);
-    width: 100%;
+    min-height: 100vh;
     box-sizing: border-box;
 }
 
 h1 {
-    color: var(--fifa-green);
+    color: var(--fifa-white);
     text-transform: uppercase;
     font-weight: 900;
     font-size: 2.5rem;
-    margin-bottom: 5px;
+    font-style: italic;
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
 }
 
-.main-card p {
+/* =========================================
+   MENÚ PRINCIPAL - TILES DE CONSOLA (IMAGEN 1)
+   ========================================= */
+.home-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    max-width: 1000px;
+    margin: 40px auto;
+}
+
+.menu-tile {
+    background: linear-gradient(135deg, var(--fifa-panel-bg) 0%, #111 100%);
+    border: 2px solid transparent;
+    border-radius: 8px;
+    padding: 30px 20px;
+    text-align: center;
+    text-decoration: none;
+    color: var(--fifa-white);
+    font-weight: 900;
+    font-size: 1.4rem;
+    text-transform: uppercase;
+    font-style: italic;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+    position: relative;
+    overflow: hidden;
+}
+
+.menu-tile::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 6px;
+    background-color: var(--fifa-cyan);
+    transition: all 0.3s ease;
+}
+
+.menu-tile:hover {
+    transform: scale(1.05);
+    border-color: var(--fifa-neon);
+    color: var(--fifa-neon);
+    box-shadow: 0 0 25px rgba(209, 245, 10, 0.2);
+    z-index: 10;
+}
+
+.menu-tile:hover::before { background-color: var(--fifa-neon); }
+
+.tile-simulacion {
+    grid-column: span 2;
+    grid-row: span 2;
+    background: linear-gradient(135deg, #1a0508 0%, var(--fifa-blue) 100%);
+    font-size: 2rem;
+}
+
+.tile-icon { font-size: 3.5rem; margin-bottom: 15px; }
+
+/* =========================================
+   CAMPO DE JUEGO Y CARTAS FUT (IMAGEN 2)
+   ========================================= */
+.pitch-container {
+    background: #004d00;
+    background-image: 
+        linear-gradient(rgba(255,255,255,0.1) 2px, transparent 2px),
+        linear-gradient(90deg, rgba(255,255,255,0.1) 2px, transparent 2px);
+    background-size: 50px 50px;
+    border: 5px solid rgba(255,255,255,0.2);
+    border-radius: 15px;
+    padding: 40px 20px;
+    position: relative;
+    min-height: 800px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.pitch-container::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 200px; height: 200px;
+    border: 2px solid rgba(255,255,255,0.2);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.position-row { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; z-index: 2; }
+
+.fut-card {
+    width: 150px; height: 210px;
+    background: linear-gradient(135deg, #f0e130 0%, #b89c1c 100%);
+    border-radius: 10px 10px 50% 50% / 10px 10px 15% 15%;
+    border: 3px solid var(--fifa-black);
     color: var(--fifa-black);
-    font-size: 1.1rem;
-    opacity: 0.8;
+    text-align: center;
+    padding: 10px;
+    box-shadow: 0 8px 15px rgba(0,0,0,0.4);
+    transition: transform 0.2s;
+    cursor: context-menu;
+    position: relative;
 }
 
-/* Botones estilo FIFA */
+.fut-card:hover { transform: translateY(-10px) scale(1.1); box-shadow: 0 0 20px var(--fifa-neon); }
+
+.card-rating { font-size: 1.8rem; font-weight: 900; margin: 0; }
+.card-pos { font-size: 0.9rem; font-weight: bold; text-transform: uppercase; }
+.card-name { margin-top: 50px; font-weight: 900; text-transform: uppercase; font-size: 1rem; border-top: 1px solid rgba(0,0,0,0.2); padding-top: 5px; }
+.card-number { position: absolute; top: 40px; right: 15px; font-size: 2rem; opacity: 0.2; font-weight: 900; }
+
+/* =========================================
+   MARCADORES DE PARTIDO (IMAGEN 3)
+   ========================================= */
+.results-container { max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 15px; }
+
+.match-result-card {
+    background: rgba(31, 40, 51, 0.8);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 40px;
+    border-bottom: 2px solid rgba(255,255,255,0.05);
+}
+
+.team-name-display { flex: 1; font-size: 1.5rem; font-weight: 300; text-transform: uppercase; letter-spacing: 2px; }
+.team-local { text-align: right; margin-right: 30px; }
+.team-visitante { text-align: left; margin-left: 30px; }
+
+.score-display {
+    background: var(--fifa-black);
+    padding: 10px 25px;
+    border-radius: 5px;
+    font-size: 2.5rem; font-weight: 900;
+    color: var(--fifa-cyan);
+    font-style: italic;
+    min-width: 120px;
+    text-align: center;
+    box-shadow: 0 0 15px rgba(0, 255, 204, 0.2);
+    border: 1px solid rgba(0, 255, 204, 0.3);
+}
+
+.match-status-tag { font-size: 0.7rem; color: var(--fifa-neon); text-transform: uppercase; letter-spacing: 3px; margin-top: 5px; display: block; }
+
+/* =========================================
+   TABLAS DE POSICIONES (IMAGEN 4)
+   ========================================= */
+.fifa-table-container { background: rgba(17, 17, 17, 0.9); border-radius: 8px; margin-bottom: 40px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+.group-header-bar { background: #1a1f24; padding: 12px 25px; color: #aaa; font-weight: bold; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; border-bottom: 1px solid #333; }
+.fifa-table-dark { width: 100%; border-collapse: collapse; color: var(--fifa-white); }
+.fifa-table-dark th { color: #666; font-size: 0.75rem; text-transform: uppercase; padding: 15px; border-bottom: 1px solid #333; }
+.fifa-table-dark td { padding: 15px; border-bottom: 1px solid #222; text-align: center; }
+.qualified-indicator { color: var(--fifa-neon); font-size: 1.1rem; margin-left: 8px; text-shadow: 0 0 10px var(--fifa-neon); }
+.team-column-dark { text-align: left !important; font-weight: bold; font-size: 1.1rem; }
+
+/* =========================================
+   BRACKET SIMÉTRICO/ESPEJO (IMAGEN 6)
+   ========================================= */
+.bracket-wrapper-split {
+    display: grid;
+    grid-template-columns: 1fr 220px 1fr;
+    align-items: center;
+    padding: 20px;
+    background: radial-gradient(circle, #2a0a10 0%, #000 100%);
+    border-radius: 12px;
+    min-height: 800px;
+}
+
+.bracket-side-group { display: flex; justify-content: space-around; align-items: center; height: 100%; }
+.side-left { justify-content: flex-start; gap: 30px; }
+.side-right { justify-content: flex-end; gap: 30px; }
+
+.round-column { display: flex; flex-direction: column; justify-content: space-around; min-width: 200px; height: 100%; }
+.match-tile { background: rgba(17, 17, 17, 0.8); border-radius: 4px; margin: 10px 0; backdrop-filter: blur(5px); }
+
+.round-column.right-aligned-cols .team-row { text-align: right; }
+.round-column.right-aligned-cols .team-row .score-box { order: -1; margin-right: 10px; }
+
+.round-column .team-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.round-column .score-box { background: var(--fifa-black); color: var(--fifa-cyan); font-weight: 900; padding: 3px 8px; border-radius: 3px; min-width: 25px; text-align: center; }
+
+.final-column { transform: scale(1.15); z-index: 10; }
+.final-match-tile { border: 3px solid gold; box-shadow: 0 0 30px rgba(255, 215, 0, 0.3); }
+.team-winner { color: var(--fifa-neon) !important; font-weight: bold; }
+
+/* =========================================
+   ELEMENTOS DE INTERFAZ COMUNES
+   ========================================= */
 .btn-fifa {
     display: inline-block;
     background: var(--fifa-blue);
@@ -53,128 +233,198 @@ h1 {
     margin: 10px 5px;
     text-decoration: none;
     border-radius: 5px;
-    border: 2px solid transparent;
     font-weight: bold;
     text-transform: uppercase;
     transition: all 0.3s ease;
     cursor: pointer;
+    border: none;
 }
 
-.btn-fifa:hover {
-    background: var(--fifa-neon);
-    color: var(--fifa-black);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(209, 245, 10, 0.4);
+.btn-fifa:hover { background: var(--fifa-neon); color: var(--fifa-black); transform: translateY(-2px); }
+
+.context-menu {
+    display: none; position: absolute; background: var(--fifa-panel-bg);
+    border: 1px solid var(--fifa-cyan); border-radius: 5px; z-index: 1000;
 }
 
-/* Inputs y Formularios (Para estandarizar las vistas faltantes) */
-input, select {
-    width: 100%;
-    padding: 12px;
-    margin: 10px 0 20px 0;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-sizing: border-box;
+.context-menu a { display: block; padding: 10px 20px; color: white; text-decoration: none; font-weight: bold; }
+.context-menu a:hover { background: var(--fifa-cyan); color: black; }
+
+.alert-error { background: var(--fifa-red); color: white; padding: 15px; border-radius: 5px; text-align: center; font-weight: bold; }
+
+/* =========================================
+   CALENDARIO (IMAGEN 7)
+   ========================================= */
+.calendar-view {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
 }
 
-input:focus, select:focus {
-    border-color: var(--fifa-blue);
-    outline: none;
-    box-shadow: 0 0 8px rgba(45, 35, 211, 0.3);
+.calendar-row {
+    display: flex;
+    margin-bottom: 10px;
+    height: 55px; /* Altura de la tira en la imagen */
+    align-items: stretch;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
 
-label {
-    font-weight: bold;
-    color: var(--fifa-green);
-    display: block;
-    text-align: left;
-}
-
-/* Estilos para Tablas */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-    background-color: var(--fifa-white);
-    color: var(--fifa-black);
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 0 10px rgba(0,0,0,0.05);
-}
-
-th {
-    background-color: var(--fifa-green);
-    color: var(--fifa-white);
-    padding: 15px;
+.stadium-tag {
+    background: #F8C301; /* El amarillo vibrante de la imagen */
+    color: #000;
+    width: 250px; /* Espacio para el nombre del estadio */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 0.85rem;
     text-transform: uppercase;
+    padding: 0 15px;
+    text-align: center;
+    border-radius: 4px 0 0 4px;
+    line-height: 1.1;
+}
+
+.teams-info-bar {
+    background: #000b21; /* Azul casi negro de la tira */
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    position: relative;
+}
+
+/* El divisor VS en cyan */
+.vs-badge {
+    color: var(--fifa-cyan);
+    font-weight: 900;
+    font-size: 1.1rem;
+    font-style: italic;
+}
+
+.team-display-name {
+    color: white;
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 1.2rem;
+    width: 200px;
+    text-align: center;
     letter-spacing: 1px;
 }
 
-td {
-    border-bottom: 1px solid #e0e0e0;
-    padding: 12px;
-    text-align: center;
+/* Decoración FIFA 26 al final de la fila */
+.teams-info-bar::after {
+    content: 'FIFA';
+    position: absolute;
+    right: 20px;
+    color: rgba(255,255,255,0.2);
+    font-weight: 900;
+    font-size: 0.8rem;
 }
 
-tr:hover {
-    background-color: var(--fifa-light-bg);
+/* =========================================
+   NODOS DE PARTIDO INTERACTIVOS (IMAGEN 0ee32a)
+   ========================================= */
+.match-node-link {
+    text-decoration: none;
+    display: block;
+    margin: 15px 0;
+    transition: all 0.3s ease;
 }
 
-/* Estilos para el menú contextual */
+.match-node-fifa {
+    background: #050505; /* Negro puro de la imagen */
+    border-radius: 4px;
+    width: 220px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+    cursor: pointer;
+}
+
+/* El brillo lateral según el estado */
+.node-pending { border-left: 4px solid var(--fifa-blue); }
+.node-finalized { border-left: 4px solid var(--fifa-neon); }
+
+.node-team-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.node-team-row:last-child { border-bottom: none; }
+
+.node-team-name {
+    color: #ddd;
+    font-weight: bold;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+}
+
+.node-score {
+    background: #111;
+    color: var(--fifa-cyan);
+    font-weight: 900;
+    padding: 2px 10px;
+    border-radius: 2px;
+    font-family: 'Courier New', Courier, monospace; /* Look digital */
+}
+
+/* Efecto al pasar el mouse (para indicar que es clickable) */
+.match-node-link:hover .match-node-fifa {
+    transform: scale(1.08);
+    border-color: var(--fifa-cyan);
+    box-shadow: 0 0 20px rgba(0, 255, 204, 0.3);
+}
+/* NODOS INTERACTIVOS BRACKET */
+.match-node-link { text-decoration: none; display: block; margin: 15px 0; transition: all 0.3s; }
+.match-node-fifa { background: #050505; border-radius: 4px; width: 220px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; }
+.match-node-link:hover .match-node-fifa { transform: scale(1.08); border-color: var(--fifa-cyan); }
+.node-team-row { display: flex; justify-content: space-between; padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.node-score { background: #111; color: var(--fifa-cyan); font-weight: 900; padding: 2px 10px; border-radius: 2px; }
+
+/* CANCHA SIMULACIÓN */
+.match-pitch {
+    background: linear-gradient(to bottom, #001a4d 0%, #000 100%);
+    height: 550px; position: relative; border-radius: 8px; border: 2px solid #1a3a6d;
+    background-image: radial-gradient(circle at center, transparent 0, transparent 60px, rgba(255,255,255,0.1) 61px, transparent 62px);
+}
+.player-dot { position: absolute; width: 28px; height: 28px; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white; }
+
+/* Menú de Clic Derecho Estilo FIFA */
 .context-menu {
     display: none;
     position: absolute;
-    background-color: var(--fifa-white);
-    border: 2px solid var(--fifa-green);
-    border-radius: 5px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    background: #111; /* Color oscuro como el fondo del dashboard */
+    border: 1px solid var(--fifa-cyan);
+    box-shadow: 0 0 15px rgba(0, 255, 204, 0.4);
     z-index: 1000;
-    min-width: 120px;
+    min-width: 160px;
+    border-radius: 4px;
+    padding: 5px 0;
 }
 
-.context-menu a {
-    display: block;
+.context-menu-item {
     padding: 10px 20px;
-    color: var(--fifa-black);
-    text-decoration: none;
-    font-weight: bold;
     cursor: pointer;
-    border-bottom: 1px solid #eee;
-    text-align: left;
-}
-
-.context-menu a:last-child {
-    border-bottom: none;
-}
-
-.context-menu a:hover {
-    background-color: var(--fifa-neon);
-    color: var(--fifa-black);
-}
-
-/* Mensajes de error o alertas */
-.alert-error {
-    background-color: var(--fifa-red);
-    color: var(--fifa-white);
-    padding: 15px;
-    border-radius: 5px;
-    margin-bottom: 20px;
+    color: white;
+    font-size: 0.9rem;
     font-weight: bold;
-    text-align: center;
-    border: 2px solid var(--fifa-black);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.2s;
 }
 
-/* Clases de utilidad */
-.highlight-text {
-    font-weight: bold;
-    color: var(--fifa-blue);
+.context-menu-item:hover {
+    background: var(--fifa-cyan);
+    color: black;
 }
-.text-right {
-    text-align: right;
-}
-.mt-20 {
-    margin-top: 20px;
-}
-.mb-20 {
-    margin-bottom: 20px;
+
+.context-menu-item.delete:hover {
+    background: var(--fifa-red);
+    color: white;
 }
