@@ -2,40 +2,72 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Registro de Estadio</title>
+    <title>Registro de Estadio - FIFA UMG</title>
     <link th:href="@{/css/fifa-style.css}" rel="stylesheet">
+    <style>
+        .form-card {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid var(--fifa-cyan);
+            border-radius: 10px;
+            padding: 30px;
+            max-width: 500px;
+            margin: 40px auto;
+            color: white;
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.2);
+        }
+        .form-card label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--fifa-cyan);
+            font-weight: bold;
+        }
+        .form-card input, .form-card select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: 1px solid #333;
+            background: #111;
+            color: white;
+            box-sizing: border-box;
+        }
+        .form-card input:focus, .form-card select:focus {
+            outline: none;
+            border-color: var(--fifa-neon);
+            box-shadow: 0 0 5px var(--fifa-neon);
+        }
+    </style>
 </head>
-<body>
-    <div class="main-card" style="max-width: 600px; margin: 40px auto;">
-        
-        <h1 th:text="${estadio.id != null} ? 'Editar Estadio' : 'Registrar Nuevo Estadio'"></h1>
-        
-        <form th:action="@{/estadios/guardar}" th:object="${estadio}" method="post">
-            
-            <input type="hidden" th:field="*{id}" />
+<body style="background: linear-gradient(to bottom, #001a4d, #000b21); min-height: 100vh; padding: 20px;">
 
-            <div>
+    <div class="main-card" style="background: transparent; border: none; box-shadow: none;">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <div style="background: #001a4d; display: inline-block; padding: 10px 30px; border-radius: 10px; border: 1px solid var(--fifa-cyan);">
+                <p style="color: white; margin: 0; font-size: 0.8rem; letter-spacing: 2px;">GESTIÓN OFICIAL DE</p>
+                <h1 style="color: var(--fifa-cyan); margin: 0; font-size: 2rem; font-style: italic;">ESTADIOS</h1>
+            </div>
+        </div>
+        
+        <div class="form-card">
+            <h2 style="text-align: center; margin-bottom: 30px; border-bottom: 1px solid #333; padding-bottom: 10px;" th:text="${estadio.id != null} ? 'Editar Estadio' : 'Registrar Nuevo Estadio'"></h2>
+            
+            <form th:action="@{/estadios/guardar}" th:object="${estadio}" method="post">
+                <input type="hidden" th:field="*{id}" />
+
                 <label>Nombre del Estadio:</label>
                 <input type="text" th:field="*{nombre}" placeholder="Ej. Estadio Azteca" required />
-            </div>
 
-            <div>
                 <label>Ciudad Sede:</label>
                 <input type="text" th:field="*{ciudad}" placeholder="Ej. Ciudad de México" required />
-            </div>
 
-            <div>
-                <label>Capacidad (Aforo total):</label>
-                <input type="number" th:field="*{capacidad}" placeholder="Ej. 83264" required />
-            </div>
+                <!-- <label>Capacidad (Aforo total):</label>
+                <input type="number" th:field="*{capacidad}" placeholder="Ej. 83264" /> -->
 
-            <button type="submit" class="btn-fifa" style="width: 100%; margin-top: 20px; font-size: 1.2rem;">
-                Guardar Sede
-            </button>
-        </form>
-        
-        <div class="mt-20">
-            <a th:href="@{/estadios}" class="btn-fifa" style="background-color: #555;">Cancelar / Volver</a>
+                <div style="text-align: center; margin-top: 20px; display: flex; gap: 15px; justify-content: center;">
+                    <button type="submit" class="btn-fifa" style="background: var(--fifa-neon); color: black; border: none; cursor: pointer; font-size: 1rem;">Guardar Sede</button>
+                    <a th:href="@{/estadios}" class="btn-fifa" style="background: var(--fifa-red); text-decoration: none;">Cancelar</a>
+                </div>
+            </form>
         </div>
     </div>
 </body>

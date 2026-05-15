@@ -22,6 +22,14 @@
             </form>
         </div>
 
+        <div class="filtros-fase" style="text-align: center; margin-bottom: 30px; display: flex; justify-content: center; flex-wrap: wrap; gap: 10px;">
+            <a href="?fase=todas" class="btn-fifa" th:style="${faseActual == null || faseActual == 'todas'} ? 'background: var(--fifa-neon); color: black;' : ''">Todas</a>
+            <a href="?fase=grupos" class="btn-fifa" th:style="${faseActual == 'grupos'} ? 'background: var(--fifa-neon); color: black;' : ''">Fase de Grupos</a>
+            <a href="?fase=octavos" class="btn-fifa" th:style="${faseActual == 'octavos'} ? 'background: var(--fifa-neon); color: black;' : ''">Octavos de Final</a>
+            <a href="?fase=cuartos" class="btn-fifa" th:style="${faseActual == 'cuartos'} ? 'background: var(--fifa-neon); color: black;' : ''">Cuartos de Final</a>
+            <a href="?fase=semis-final" class="btn-fifa" th:style="${faseActual == 'semis-final'} ? 'background: var(--fifa-neon); color: black;' : ''">Semifinal y Final</a>
+        </div>
+
         <div class="calendar-view">
             <div th:each="partido : ${encuentros}" class="calendar-row">
                 

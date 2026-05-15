@@ -165,7 +165,13 @@ public class SimulacionController {
         List<Jugador> plantilla = jugadorDao.findByEquipo(equipo);
         if (plantilla.isEmpty()) return;
 
-        List<Jugador> jugadoresDisponibles = new ArrayList<>(plantilla);
+        List<Jugador> jugadoresDisponibles = plantilla.stream()
+                .filter(j -> j.getPosicion() == null || !j.getPosicion().getDescripcion().toLowerCase().contains("portero"))
+                .collect(Collectors.toList());
+
+        if (jugadoresDisponibles.isEmpty()) {
+            jugadoresDisponibles = new ArrayList<>(plantilla);
+        }
         Collections.shuffle(jugadoresDisponibles);
         
         Random rand = new Random();
@@ -459,31 +465,53 @@ public class SimulacionController {
         for (Jugador j : plantillaVisitante) ratings.put(j.getId(), 75.0 + rand.nextDouble() * 20.0);
         model.addAttribute("ratings", ratings);
 
-        // Preparamos los eventos (Goles) de manera progresiva para que Javascript dibuje la simulación
-        List<Gol> eventos = new ArrayList<>();
+        // Preparamos los eventos (Goles y Tarjetas) de manera progresiva para que Javascript dibuje la simulación
+        List<Map<String, Object>> eventos = new ArrayList<>();
         int gl = partido.getGolesLocal() != null ? partido.getGolesLocal() : 0;
         int gv = partido.getGolesVisitante() != null ? partido.getGolesVisitante() : 0;
 
+        List<Jugador> campoLocal = plantillaLocal.stream().filter(j -> j.getPosicion() == null || !j.getPosicion().getDescripcion().toLowerCase().contains("portero")).collect(Collectors.toList());
+        if (campoLocal.isEmpty()) campoLocal = plantillaLocal;
+        
+        List<Jugador> campoVisitante = plantillaVisitante.stream().filter(j -> j.getPosicion() == null || !j.getPosicion().getDescripcion().toLowerCase().contains("portero")).collect(Collectors.toList());
+        if (campoVisitante.isEmpty()) campoVisitante = plantillaVisitante;
+
         for (int i = 0; i < gl; i++) {
-            Gol gol = new Gol();
-            gol.setMinuto(rand.nextInt(90) + 1);
-            Jugador j = plantillaLocal.isEmpty() ? new Jugador() : plantillaLocal.get(rand.nextInt(plantillaLocal.size()));
+            Map<String, Object> evt = new HashMap<>();
+            evt.put("minuto", rand.nextInt(90) + 1);
+            Jugador j = campoLocal.isEmpty() ? new Jugador() : campoLocal.get(rand.nextInt(campoLocal.size()));
             if (j.getEquipo() == null) j.setEquipo(partido.getEquipoLocal());
             if (j.getNombreCompleto() == null) j.setNombreCompleto("Delantero Local");
-            gol.setJugador(j);
-            eventos.add(gol);
+            evt.put("jugador", j);
+            evt.put("tipo", "GOL");
+            eventos.add(evt);
         }
         for (int i = 0; i < gv; i++) {
-            Gol gol = new Gol();
-            gol.setMinuto(rand.nextInt(90) + 1);
-            Jugador j = plantillaVisitante.isEmpty() ? new Jugador() : plantillaVisitante.get(rand.nextInt(plantillaVisitante.size()));
+            Map<String, Object> evt = new HashMap<>();
+            evt.put("minuto", rand.nextInt(90) + 1);
+            Jugador j = campoVisitante.isEmpty() ? new Jugador() : campoVisitante.get(rand.nextInt(campoVisitante.size()));
             if (j.getEquipo() == null) j.setEquipo(partido.getEquipoVisitante());
             if (j.getNombreCompleto() == null) j.setNombreCompleto("Delantero Visitante");
-            gol.setJugador(j);
-            eventos.add(gol);
+            evt.put("jugador", j);
+            evt.put("tipo", "GOL");
+            eventos.add(evt);
         }
         
-        eventos.sort((e1, e2) -> Integer.compare(e1.getMinuto(), e2.getMinuto()));
+        int totalTarjetas = rand.nextInt(5);
+        for (int i = 0; i < totalTarjetas; i++) {
+            Map<String, Object> evt = new HashMap<>();
+            evt.put("minuto", rand.nextInt(90) + 1);
+            boolean isLocal = rand.nextBoolean();
+            List<Jugador> team = isLocal ? plantillaLocal : plantillaVisitante;
+            Jugador j = team.isEmpty() ? new Jugador() : team.get(rand.nextInt(team.size()));
+            if (j.getEquipo() == null) j.setEquipo(isLocal ? partido.getEquipoLocal() : partido.getEquipoVisitante());
+            if (j.getNombreCompleto() == null) j.setNombreCompleto("Jugador");
+            evt.put("jugador", j);
+            evt.put("tipo", rand.nextInt(100) < 80 ? "AMARILLA" : "ROJA");
+            eventos.add(evt);
+        }
+        
+        eventos.sort((e1, e2) -> ((Integer) e1.get("minuto")).compareTo((Integer) e2.get("minuto")));
         model.addAttribute("eventos", eventos);
 
         return "partido-simulacion";
