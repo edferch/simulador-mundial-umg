@@ -1,31 +1,76 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Gestión de Selección</title>
+    <meta charset="UTF-8">
+    <title>Gestión de Selección - FIFA UMG</title>
     <link rel="stylesheet" th:href="@{/css/fifa-style.css}">
+    <style>
+        .form-card {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid var(--fifa-cyan);
+            border-radius: 10px;
+            padding: 30px;
+            max-width: 500px;
+            margin: 40px auto;
+            color: white;
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.2);
+        }
+        .form-card label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--fifa-cyan);
+            font-weight: bold;
+        }
+        .form-card input, .form-card select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: 1px solid #333;
+            background: #111;
+            color: white;
+            box-sizing: border-box;
+        }
+        .form-card input:focus, .form-card select:focus {
+            outline: none;
+            border-color: var(--fifa-neon);
+            box-shadow: 0 0 5px var(--fifa-neon);
+        }
+    </style>
 </head>
-<body>
-    <div class="form-container">
-        <h2 th:text="${equipo.id == null ? 'Nueva Selección' : 'Editar Selección'}">Formulario</h2>
+<body style="background: linear-gradient(to bottom, #001a4d, #000b21); min-height: 100vh; padding: 20px;">
+    <div class="main-card" style="background: transparent; border: none; box-shadow: none;">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <div style="background: #001a4d; display: inline-block; padding: 10px 30px; border-radius: 10px; border: 1px solid var(--fifa-cyan);">
+                <p style="color: white; margin: 0; font-size: 0.8rem; letter-spacing: 2px;">GESTIÓN OFICIAL DE</p>
+                <h1 style="color: var(--fifa-cyan); margin: 0; font-size: 2rem; font-style: italic;">SELECCIONES</h1>
+            </div>
+        </div>
         
-        <form th:action="@{/equipos/guardar}" th:object="${equipo}" method="post">
-            <input type="hidden" th:field="*{id}">
+        <div class="form-card">
+            <h2 style="text-align: center; margin-bottom: 30px; border-bottom: 1px solid #333; padding-bottom: 10px;" th:text="${equipo.id == null ? 'Nueva Selección' : 'Editar Selección'}">Formulario</h2>
             
-            <label>Nombre de la Selección:</label>
-            <input type="text" th:field="*{nombreEquipo}" required>
-
-            <label>País (Catálogo):</label>
-            <select th:field="*{pais.id}" required>
-                <option value="">-- Seleccione un país --</option>
-                <option th:each="p : ${paises}" th:value="${p.id}" th:text="${p.nombre}"></option>
-            </select>
-
-            <label>Grupo asignado:</label>
-            <input type="text" th:field="*{grupo}" maxlength="1" placeholder="Ej: A">
-
-            <button type="submit" class="btn-save">Guardar Cambios</button>
-            <a th:href="@{/equipos}" class="btn-cancel">Cancelar</a>
-        </form>
+            <form th:action="@{/equipos/guardar}" th:object="${equipo}" method="post">
+                <input type="hidden" th:field="*{id}">
+                
+                <label>Nombre de la Selección:</label>
+                <input type="text" th:field="*{nombreEquipo}" required>
+    
+                <label>País (Catálogo):</label>
+                <select th:field="*{pais.id}" required>
+                    <option value="">-- Seleccione un país --</option>
+                    <option th:each="p : ${paises}" th:value="${p.id}" th:text="${p.nombre}"></option>
+                </select>
+    
+                <label>Grupo asignado:</label>
+                <input type="text" th:field="*{grupo}" maxlength="1" placeholder="Ej: A">
+    
+                <div style="text-align: center; margin-top: 20px; display: flex; gap: 15px; justify-content: center;">
+                    <button type="submit" class="btn-fifa" style="background: var(--fifa-neon); color: black; border: none; cursor: pointer; font-size: 1rem;">Guardar Selección</button>
+                    <a th:href="@{/equipos}" class="btn-fifa" style="background: var(--fifa-red); text-decoration: none;">Cancelar</a>
+                </div>
+            </form>
+        </div>
     </div>
 </body>
 </html>

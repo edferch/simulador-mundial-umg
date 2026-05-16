@@ -7,6 +7,16 @@
 </head>
 <body style="background: linear-gradient(to bottom, #001a4d, #000b21); min-height: 100vh; padding: 20px;">
 
+    <!-- Menú Contextual (Click Derecho) -->
+    <div id="context-menu" style="display: none; position: absolute; z-index: 1000; background: rgba(0, 0, 0, 0.9); border: 1px solid var(--fifa-cyan); border-radius: 8px; padding: 5px 0; box-shadow: 0 0 15px rgba(0, 255, 204, 0.3); min-width: 150px;">
+        <a id="menu-editar" href="#" style="display: block; padding: 10px 20px; color: white; text-decoration: none; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.1); transition: background 0.2s;">
+             Editar Sede
+        </a>
+        <a id="menu-eliminar" href="#" style="display: block; padding: 10px 20px; color: #EA0036; text-decoration: none; font-weight: bold; transition: background 0.2s;" onclick="return confirm('¿Estás seguro de eliminar este estadio?');">
+              Eliminar Sede
+        </a>
+    </div>
+
     <div class="main-card" style="background: transparent; border: none; box-shadow: none;">
         
         <div style="text-align: center; margin-bottom: 40px;">
@@ -18,7 +28,7 @@
 
         <!-- Malla o cuadrícula de Estadios -->
         <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px;">
-            <div th:each="estadio : ${estadios}" style="background: rgba(0,0,0,0.6); border: 1px solid #333; border-radius: 10px; padding: 20px; width: 300px; text-align: center; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+            <div th:each="estadio : ${estadios}" class="estadio-card" th:data-id="${estadio.id}" style="background: rgba(0,0,0,0.6); border: 1px solid #333; border-radius: 10px; padding: 20px; width: 300px; text-align: center; transition: transform 0.3s, border-color 0.3s; cursor: context-menu;" onmouseover="this.style.transform='scale(1.05)'; this.style.borderColor='var(--fifa-cyan)';" onmouseout="this.style.transform='scale(1)'; this.style.borderColor='#333';">
                 <div style="font-size: 3rem; margin-bottom: 10px;"></div>
                 <h2 style="color: white; margin-bottom: 5px; font-size: 1.3rem;" th:text="${estadio.nombre}">Nombre del Estadio</h2>
                 <p style="color: var(--fifa-cyan); font-weight: bold; margin-top: 0; font-size: 1.1rem;" th:text="' ' + ${estadio.ciudad}">Ciudad</p>
@@ -30,5 +40,39 @@
         </div>
     </div>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const contextMenu = document.getElementById('context-menu');
+            const menuEditar = document.getElementById('menu-editar');
+            const menuEliminar = document.getElementById('menu-eliminar');
+
+            document.querySelectorAll('.estadio-card').forEach(card => {
+                card.addEventListener('contextmenu', (e) => {
+                    e.preventDefault(); // Evitar el menú nativo del navegador
+                    
+                    const estadioId = card.getAttribute('data-id');
+                    menuEditar.href = '/estadios/editar/' + estadioId;
+                    menuEliminar.href = '/estadios/eliminar/' + estadioId;
+                    
+                    contextMenu.style.display = 'block';
+                    contextMenu.style.left = `${e.pageX}px`;
+                    contextMenu.style.top = `${e.pageY}px`;
+                });
+            });
+
+            // Ocultar menú si se hace clic izquierdo en cualquier otra parte
+            document.addEventListener('click', (e) => {
+                if (e.button !== 2) {
+                    contextMenu.style.display = 'none';
+                }
+            });
+            
+            // Efectos hover para las opciones del menú
+            [menuEditar, menuEliminar].forEach(item => {
+                item.addEventListener('mouseover', () => item.style.background = 'rgba(255,255,255,0.1)');
+                item.addEventListener('mouseout', () => item.style.background = 'transparent');
+            });
+        });
+    </script>
 </body>
 </html>

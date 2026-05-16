@@ -75,10 +75,12 @@
                 <h4 style="color: var(--fifa-neon);">CRONOLOGÍA</h4>
                 <div id="events-container">
                     <div th:each="ev : ${eventos}" class="match-event-row event-hidden" 
-                         th:data-minuto="${ev.minuto}" th:data-equipo="${ev.jugador.equipo.id}">
+                         th:data-minuto="${ev.minuto}" th:data-equipo="${ev.jugador.equipo.id}" th:data-tipo="${ev.tipo}">
                         <div style="margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 5px;">
                             <span th:text="${ev.minuto} + '\''" style="color: var(--fifa-cyan); font-weight: 900;"></span>
-                            <span th:text="'GOL ' + ${ev.jugador.nombreCompleto}" style="color: white; font-weight: bold;"></span>
+                            <span th:if="${ev.tipo == 'GOL'}" th:text="'⚽ GOL ' + ${ev.jugador.nombreCompleto}" style="color: white; font-weight: bold;"></span>
+                            <span th:if="${ev.tipo == 'AMARILLA'}" th:text="'🟨 AMARILLA ' + ${ev.jugador.nombreCompleto}" style="color: #F8C301; font-weight: bold;"></span>
+                            <span th:if="${ev.tipo == 'ROJA'}" th:text="'🟥 ROJA ' + ${ev.jugador.nombreCompleto}" style="color: #EA0036; font-weight: bold;"></span>
                         </div>
                     </div>
                 </div>
@@ -138,24 +140,28 @@
                     if (parseInt(row.dataset.minuto) === minute) {
                         row.classList.remove("event-hidden");
                         
-                        if (parseInt(row.dataset.equipo) === localId) {
-                            curScoreL++;
-                            scoreLocalEl.innerText = curScoreL;
-                        } else {
-                            curScoreV++;
-                            scoreVisitEl.innerText = curScoreV;
+                        if (row.dataset.tipo === 'GOL') {
+                            if (parseInt(row.dataset.equipo) === localId) {
+                                curScoreL++;
+                                scoreLocalEl.innerText = curScoreL;
+                            } else {
+                                curScoreV++;
+                                scoreVisitEl.innerText = curScoreV;
+                            }
+
+                            // Efecto de gol rápido
+                            const teamClass = (parseInt(row.dataset.equipo) === localId) ? ".dot-local" : ".dot-visit";
+                            const teamDots = document.querySelectorAll(teamClass + "[data-pos!='Portero']");
+                            const scorer = teamDots[Math.floor(Math.random() * teamDots.length)];
+                            
+                            if (scorer) {
+                                scorer.classList.add("goal-flash-active");
+                                if (parseInt(row.dataset.equipo) === localId) scorer.style.left = "94%";
+                                else scorer.style.left = "6%";
+
+                                setTimeout(() => scorer.classList.remove("goal-flash-active"), 1200);
+                            }
                         }
-
-                        // Efecto de gol rápido
-                        const teamClass = (parseInt(row.dataset.equipo) === localId) ? ".dot-local" : ".dot-visit";
-                        const teamDots = document.querySelectorAll(teamClass + "[data-pos!='Portero']");
-                        const scorer = teamDots[Math.floor(Math.random() * teamDots.length)];
-                        
-                        scorer.classList.add("goal-flash-active");
-                        if (parseInt(row.dataset.equipo) === localId) scorer.style.left = "94%";
-                        else scorer.style.left = "6%";
-
-                        setTimeout(() => scorer.classList.remove("goal-flash-active"), 1200);
                     }
                 });
 
